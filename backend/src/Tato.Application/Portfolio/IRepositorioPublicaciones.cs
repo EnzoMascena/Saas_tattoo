@@ -19,8 +19,14 @@ public interface IRepositorioPublicaciones
     Task AgregarAsync(Publicacion publicacion, CancellationToken cancellationToken);
 
     /// <summary>
-    /// Guarda los cambios de una publicación que ya se obtuvo con <see cref="ObtenerAsync"/>.
-    /// Si alguien la modificó en el medio, lanza una excepción de concurrencia en lugar de pisar los cambios.
+    /// Guarda los cambios de una publicación obtenida con <see cref="ObtenerAsync"/> y devuelve su versión nueva.
     /// </summary>
-    Task GuardarCambiosAsync(CancellationToken cancellationToken);
+    /// <param name="versionEsperada">
+    /// La versión que tenía el panel al abrirla, en base64. Si alguien la modificó desde entonces, lanza
+    /// ConflictoDeVersionException en lugar de pisar sus cambios (concurrencia optimista, doc 04).
+    /// </param>
+    Task<string> GuardarCambiosAsync(
+        Publicacion publicacion,
+        string versionEsperada,
+        CancellationToken cancellationToken);
 }
