@@ -10,6 +10,11 @@ namespace Tato.Infrastructure.Portfolio;
 /// </summary>
 internal sealed class PublicacionConfiguration : IEntityTypeConfiguration<Publicacion>
 {
+    /// <summary>
+    /// Columna de concurrencia optimista. Es una propiedad shadow: existe en la base, no en la clase del dominio.
+    /// </summary>
+    internal const string ColumnaVersion = "RowVersion";
+
     public void Configure(EntityTypeBuilder<Publicacion> builder)
     {
         builder.ToTable("Publicaciones");
@@ -44,7 +49,7 @@ internal sealed class PublicacionConfiguration : IEntityTypeConfiguration<Public
         // Concurrencia optimista (doc 04): si dos personas editan la misma publicación,
         // la segunda recibe un error y no pisa los cambios de la primera.
         // Es una columna solo de la base, así que el dominio no la conoce.
-        builder.Property<byte[]>("RowVersion").IsRowVersion();
+        builder.Property<byte[]>(ColumnaVersion).IsRowVersion();
 
         // La navegación es la propiedad Fotos. EF encuentra solo el campo _fotos por su nombre,
         // y con PropertyAccessMode.Field lee y escribe ahí, no en la copia ordenada que devuelve Fotos.

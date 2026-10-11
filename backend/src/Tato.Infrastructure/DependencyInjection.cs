@@ -9,6 +9,7 @@ using Tato.Infrastructure.Comun;
 using Tato.Infrastructure.Estudios;
 using Tato.Infrastructure.Persistencia;
 using Tato.Infrastructure.Portfolio;
+using Tato.Infrastructure.Portfolio;
 
 namespace Tato.Infrastructure;
 
@@ -38,6 +39,8 @@ public static class DependencyInjection
 
         // Adaptadores de los puertos de Application (doc 06, 6.1).
         services.AddScoped<IRegistroEstudios, RegistroEstudios>();
+        
+        services.AddScoped<IConsultasPublicaciones, ConsultasPublicaciones>();
 
         AgregarArchivosYFotos(services, configuration);
 
