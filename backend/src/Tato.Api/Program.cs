@@ -1,5 +1,6 @@
 using Tato.Api.Comun;
 using Tato.Api.Estudios;
+using Tato.Api.Portfolio;
 using Tato.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,7 @@ builder.Services.AddExceptionHandler<ManejadorErrores>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAutenticacion();
 builder.Services.AddEstudios();
+builder.Services.AddPortfolio();
 
 var app = builder.Build();
 
