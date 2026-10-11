@@ -1,10 +1,11 @@
 using System.Security.Claims;
 using Tato.Application.Estudios;
+using Tato.Domain.Estudios;
 
 namespace Tato.Api.Estudios;
 
 /// <summary>
-/// Toma el Id del usuario del claim de identificador que guarda la cookie al iniciar sesión.
+/// Toma el Id y los roles del usuario de los claims que guarda la cookie al iniciar sesión.
 /// </summary>
 internal sealed class UsuarioActualDesdeSesion : IUsuarioActual
 {
@@ -15,10 +16,14 @@ internal sealed class UsuarioActualDesdeSesion : IUsuarioActual
         _httpContextAccessor = httpContextAccessor;
     }
 
+    private ClaimsPrincipal? Usuario => _httpContextAccessor.HttpContext?.User;
+
     public Guid? UsuarioId =>
-        Guid.TryParse(
-            _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value,
-            out var usuarioId)
+        Guid.TryParse(Usuario?.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var usuarioId)
             ? usuarioId
             : null;
+
+    public bool EsDuenio => Usuario?.IsInRole(nameof(Rol.Duenio)) ?? false;
+
+    public bool EsAdministrativo => Usuario?.IsInRole(nameof(Rol.Administrativo)) ?? false;
 }
