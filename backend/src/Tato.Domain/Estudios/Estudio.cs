@@ -100,6 +100,8 @@ public sealed class Estudio
             throw new ArgumentException(
                 $"La zona horaria no puede exceder {MaxZonaHoraria} caracteres.", nameof(zonaHoraria));
 
+        zona = ValidarZonaHoraria(zona);
+
         // Si no se especifican, se usan los valores por defecto (D-34).
         var dias = diasVencimientoSenia ?? DiasVencimientoSeniaPorDefecto;
         var max = maxReagendamientos ?? MaxReagendamientosPorDefecto;
@@ -145,6 +147,22 @@ public sealed class Estudio
         if (maxReagendamientos < 0)
             throw new ArgumentException(
                 "El máximo de reagendamientos no puede ser negativo.", nameof(maxReagendamientos));
+    }
+
+    /// <summary>
+    /// Valida que la zona horaria exista y sea un identificador IANA (D-43), y la devuelve con su nombre
+    /// oficial: «america/argentina/buenos_aires» se guarda como «America/Argentina/Buenos_Aires».
+    /// Rechaza los identificadores de Windows («Argentina Standard Time») y los inventados («Argentina»).
+    /// </summary>
+    private static string ValidarZonaHoraria(string zonaHoraria)
+    {
+        if (!TimeZoneInfo.TryFindSystemTimeZoneById(zonaHoraria, out var zona) || !zona.HasIanaId)
+            throw new ArgumentException(
+                $"La zona horaria «{zonaHoraria}» no existe. Usá un identificador IANA, " +
+                $"como {ZonaHorariaPorDefecto}.",
+                nameof(zonaHoraria));
+
+        return zona.Id;
     }
 
     /// <summary>
