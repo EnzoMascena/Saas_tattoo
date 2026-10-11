@@ -21,4 +21,9 @@ public interface IReferenciasDelEstudio
     /// Si el perfil de tatuador existe.
     /// </summary>
     Task<bool> TatuadorExisteAsync(Guid tatuadorId, CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Máximo de fotos por publicación que configuró el estudio (RN-BLG-04, D-34).
+    /// </summary>
+    Task<int> MaxFotosPorPublicacionAsync(CancellationToken cancellationToken);
 }

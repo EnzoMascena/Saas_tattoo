@@ -11,10 +11,12 @@ namespace Tato.Infrastructure.Estudios;
 internal sealed class ReferenciasDelEstudio : IReferenciasDelEstudio
 {
     private readonly TatoDbContext _db;
+    private readonly IEstudioActual _estudioActual;
 
-    public ReferenciasDelEstudio(TatoDbContext db)
+    public ReferenciasDelEstudio(TatoDbContext db, IEstudioActual estudioActual)
     {
         _db = db;
+        _estudioActual = estudioActual;
     }
 
     public Task<bool> EstiloDisponibleAsync(Guid estiloId, CancellationToken cancellationToken) =>
@@ -25,4 +27,16 @@ internal sealed class ReferenciasDelEstudio : IReferenciasDelEstudio
 
     public Task<bool> TatuadorExisteAsync(Guid tatuadorId, CancellationToken cancellationToken) =>
         _db.Tatuadores.AnyAsync(t => t.Id == tatuadorId, cancellationToken);
+
+    public async Task<int> MaxFotosPorPublicacionAsync(CancellationToken cancellationToken)
+    {
+        // Estudios no tiene filtro por estudio (cada fila es un estudio): se filtra con el de la sesión.
+        var estudioId = _estudioActual.EstudioId
+            ?? throw new InvalidOperationException("No hay un estudio en la sesión.");
+
+        return await _db.Estudios
+            .Where(e => e.Id == estudioId)
+            .Select(e => e.MaxFotosPorPublicacion)
+            .SingleAsync(cancellationToken);
+    }
 }
