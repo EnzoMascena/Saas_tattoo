@@ -12,7 +12,9 @@ if (esComando)
     builder.Logging.ClearProviders();
 
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();
+
+// Todo POST, PUT, PATCH y DELETE de los controladores exige el token antiforgery (doc 06, 7.1).
+builder.Services.AddControllers(opciones => opciones.Filters.Add<ValidarAntiforgery>());
 
 // Errores con formato ProblemDetails (RFC 9457): las excepciones las traduce ManejadorErrores.
 builder.Services.AddProblemDetails();

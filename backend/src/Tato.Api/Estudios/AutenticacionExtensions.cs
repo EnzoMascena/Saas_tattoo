@@ -17,6 +17,11 @@ public static class AutenticacionExtensions
     /// </summary>
     public const string PoliticaLogin = "login";
 
+    /// <summary>
+    /// Encabezado en el que el panel manda el token antiforgery en cada pedido que modifica datos.
+    /// </summary>
+    public const string EncabezadoAntiforgery = "X-XSRF-TOKEN";
+
     public static IServiceCollection AddAutenticacion(this IServiceCollection services)
     {
         services.AddIdentityCore<CuentaUsuario>(opciones =>
@@ -66,6 +71,18 @@ public static class AutenticacionExtensions
                 contexto.Response.StatusCode = StatusCodes.Status403Forbidden;
                 return Task.CompletedTask;
             };
+        });
+
+        // Antiforgery (doc 06, 7.1): todo pedido que modifica datos tiene que traer, además de la cookie de sesión,
+        // un token en un encabezado. Otra página puede hacer que el navegador mande la cookie, pero no puede leer
+        // el token, así que no puede falsificar un pedido. El token lo entrega GET /api/auth/antiforgery.
+        services.AddAntiforgery(opciones =>
+        {
+            opciones.HeaderName = EncabezadoAntiforgery;
+            opciones.Cookie.Name = "__Host-tato-af";
+            opciones.Cookie.HttpOnly = true;
+            opciones.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+            opciones.Cookie.SameSite = SameSiteMode.Strict;
         });
 
         // Seguro por defecto (doc 06, 1): todo endpoint pide sesión salvo que diga [AllowAnonymous].
