@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Tato.Api.Comun;
 using Tato.Api.Estudios;
 using Tato.Api.Portfolio;
@@ -15,7 +16,9 @@ if (esComando)
 builder.Services.AddOpenApi();
 
 // Todo POST, PUT, PATCH y DELETE de los controladores exige el token antiforgery (doc 06, 7.1).
-builder.Services.AddControllers(opciones => opciones.Filters.Add<ValidarAntiforgery>());
+builder.Services.AddControllers(opciones => opciones.Filters.Add<ValidarAntiforgery>())
+    // Los enums viajan como texto ("Borrador"), no como número: el front no depende del orden del enum.
+    .AddJsonOptions(opciones => opciones.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // Errores con formato ProblemDetails (RFC 9457): las excepciones las traduce ManejadorErrores.
 builder.Services.AddProblemDetails();
