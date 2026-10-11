@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Tato.Application.Comun;
 using Tato.Application.Portfolio;
 using Tato.Domain.Comun;
 
@@ -61,6 +62,30 @@ internal sealed class ManejadorErrores : IExceptionHandler
             Title = "La operación no cumple una regla del negocio.",
             Detail = regla.Message,
             Extensions = { ["regla"] = regla.Regla },
+        },
+
+        // No existe o es de otro estudio: se responde igual en los dos casos (D-42).
+        NoEncontradoException noEncontrado => new ProblemDetails
+        {
+            Status = StatusCodes.Status404NotFound,
+            Title = "No se encontró lo que buscabas.",
+            Detail = noEncontrado.Message,
+        },
+
+        // Tiene sesión, pero su rol no le permite hacerlo (P-21).
+        AccesoDenegadoException acceso => new ProblemDetails
+        {
+            Status = StatusCodes.Status403Forbidden,
+            Title = "No tenés permiso para hacer esto.",
+            Detail = acceso.Message,
+        },
+
+        // Otra persona lo modificó mientras se editaba: el panel recarga y vuelve a intentar.
+        ConflictoDeVersionException conflicto => new ProblemDetails
+        {
+            Status = StatusCodes.Status409Conflict,
+            Title = "Alguien modificó esto mientras lo editabas.",
+            Detail = conflicto.Message,
         },
 
         FotoInvalidaException foto => new ProblemDetails
