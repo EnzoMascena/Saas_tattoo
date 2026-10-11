@@ -12,6 +12,7 @@ public sealed class Estudio
     public const string ZonaHorariaPorDefecto = "America/Argentina/Buenos_Aires";
     public const int DiasVencimientoSeniaPorDefecto = 14;
     public const int MaxReagendamientosPorDefecto = 2;
+    public const int MaxFotosPorPublicacionPorDefecto = 10;
 
     private Estudio(
         Guid id,
@@ -19,7 +20,8 @@ public sealed class Estudio
         string plan,
         string zonaHoraria,
         int diasVencimientoSenia,
-        int maxReagendamientos)
+        int maxReagendamientos,
+        int maxFotosPorPublicacion)
     {
         Id = id;
         Nombre = nombre;
@@ -27,6 +29,7 @@ public sealed class Estudio
         ZonaHoraria = zonaHoraria;
         DiasVencimientoSenia = diasVencimientoSenia;
         MaxReagendamientos = maxReagendamientos;
+        MaxFotosPorPublicacion = maxFotosPorPublicacion;
     }
 
     /// <summary>
@@ -61,12 +64,18 @@ public sealed class Estudio
     /// </summary>
     public int MaxReagendamientos { get; private set; }
 
+    /// <summary>
+    /// Máximo de fotos por publicación del blog (por defecto, 10). Configurable por estudio (RN-BLG-04, D-34).
+    /// </summary>
+    public int MaxFotosPorPublicacion { get; private set; }
+
     public static Estudio Crear(
         string nombre,
         string plan,
         string? zonaHoraria = null,
         int? diasVencimientoSenia = null,
-        int? maxReagendamientos = null)
+        int? maxReagendamientos = null,
+        int? maxFotosPorPublicacion = null)
     {
         if (string.IsNullOrWhiteSpace(nombre))
             throw new ArgumentException("El nombre del estudio no puede estar vacio.", nameof(nombre));
@@ -94,10 +103,12 @@ public sealed class Estudio
         // Si no se especifican, se usan los valores por defecto (D-34).
         var dias = diasVencimientoSenia ?? DiasVencimientoSeniaPorDefecto;
         var max = maxReagendamientos ?? MaxReagendamientosPorDefecto;
+        var maxFotos = maxFotosPorPublicacion ?? MaxFotosPorPublicacionPorDefecto;
 
         ValidarParametros(dias, max);
+        ValidarMaxFotos(maxFotos);
 
-        return new Estudio(Guid.NewGuid(), nombreLimpio, planLimpio, zona, dias, max);
+        return new Estudio(Guid.NewGuid(), nombreLimpio, planLimpio, zona, dias, max, maxFotos);
     }
 
     /// <summary>
@@ -113,6 +124,16 @@ public sealed class Estudio
     }
 
     /// <summary>
+    /// Cambia el máximo de fotos por publicación. Solo el Dueño puede hacerlo.
+    /// </summary>
+    public void ConfigurarMaxFotosPorPublicacion(int maxFotosPorPublicacion)
+    {
+        ValidarMaxFotos(maxFotosPorPublicacion);
+
+        MaxFotosPorPublicacion = maxFotosPorPublicacion;
+    }
+
+    /// <summary>
     /// Valida los parámetros de negocio del estudio (D-34).
     /// </summary>
     private static void ValidarParametros(int diasVencimientoSenia, int maxReagendamientos)
@@ -124,5 +145,15 @@ public sealed class Estudio
         if (maxReagendamientos < 0)
             throw new ArgumentException(
                 "El máximo de reagendamientos no puede ser negativo.", nameof(maxReagendamientos));
+    }
+
+    /// <summary>
+    /// Valida el máximo de fotos por publicación (RN-BLG-04).
+    /// </summary>
+    private static void ValidarMaxFotos(int maxFotosPorPublicacion)
+    {
+        if (maxFotosPorPublicacion <= 0)
+            throw new ArgumentException(
+                "El máximo de fotos por publicación tiene que ser mayor a 0.", nameof(maxFotosPorPublicacion));
     }
 }
