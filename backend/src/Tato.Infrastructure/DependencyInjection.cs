@@ -39,6 +39,7 @@ public static class DependencyInjection
         // Adaptadores de los puertos de Application (doc 06, 6.1).
         services.AddScoped<IRegistroEstudios, RegistroEstudios>();
         services.AddScoped<IConsultasPublicaciones, ConsultasPublicaciones>();
+        services.AddSingleton(TimeProvider.System);
         services.AddScoped<IRepositorioPublicaciones, RepositorioPublicaciones>();
 
         AgregarArchivosYFotos(services, configuration);
