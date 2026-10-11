@@ -1,3 +1,5 @@
+using Tato.Domain.Comun;
+
 namespace Tato.Domain.Estudios;
 
 /// <summary>

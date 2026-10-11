@@ -2,6 +2,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Tato.Application.Estudios;
+using Tato.Domain.Comun;
 using Tato.Domain.Estudios;
 using Tato.Domain.Portfolio;
 using Tato.Infrastructure.Estudios;

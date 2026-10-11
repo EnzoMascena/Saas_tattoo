@@ -1,4 +1,4 @@
-using Tato.Domain.Estudios;
+using Tato.Domain.Comun;
 
 namespace Tato.Domain.Portfolio;
 
