@@ -51,6 +51,22 @@ public sealed class PublicacionesController : ControllerBase
 
         return CreatedAtAction(nameof(Obtener), new { id }, new PublicacionCreadaRespuesta(id));
     }
+
+    /// <summary>
+    /// Reemplaza los datos de la publicación. Devuelve la versión nueva, para seguir editando sin recargar.
+    /// 409 si alguien la modificó desde que se abrió.
+    /// </summary>
+    [HttpPut("{id:guid}")]
+    public async Task<PublicacionVersionRespuesta> Editar(
+        Guid id,
+        SolicitudEditarPublicacion solicitud,
+        [FromServices] EditarPublicacion editarPublicacion,
+        CancellationToken cancellationToken)
+    {
+        var version = await editarPublicacion.EjecutarAsync(id, solicitud.ADatos(), solicitud.Version, cancellationToken);
+
+        return new PublicacionVersionRespuesta(version);
+    }
 }
 
 /// <summary>
@@ -69,4 +85,23 @@ public sealed record SolicitudPublicacion(
         new(Titulo, Descripcion, FechaTrabajo, EstiloId, ZonaCuerpoId, TatuadorId, Destacada);
 }
 
+/// <summary>
+/// Los datos nuevos de la publicación, más la versión que tenía el panel al abrirla.
+/// </summary>
+public sealed record SolicitudEditarPublicacion(
+    string Titulo,
+    string? Descripcion,
+    DateOnly? FechaTrabajo,
+    Guid? EstiloId,
+    Guid? ZonaCuerpoId,
+    Guid? TatuadorId,
+    bool Destacada,
+    string Version)
+{
+    internal DatosPublicacion ADatos() =>
+        new(Titulo, Descripcion, FechaTrabajo, EstiloId, ZonaCuerpoId, TatuadorId, Destacada);
+}
+
 public sealed record PublicacionCreadaRespuesta(Guid Id);
+
+public sealed record PublicacionVersionRespuesta(string Version);

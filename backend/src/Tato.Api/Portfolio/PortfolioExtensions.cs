@@ -10,6 +10,7 @@ public static class PortfolioExtensions
     public static IServiceCollection AddPortfolio(this IServiceCollection services)
     {
         services.AddScoped<CrearPublicacion>();
+        services.AddScoped<EditarPublicacion>();
 
         return services;
     }
