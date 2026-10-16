@@ -12,6 +12,8 @@ public static class PortfolioExtensions
         services.AddScoped<CrearPublicacion>();
         services.AddScoped<EditarPublicacion>();
         services.AddScoped<AccionesPublicacion>();
+        services.AddScoped<SubirFoto>();
+        services.AddScoped<LeerFoto>();
 
         return services;
     }
