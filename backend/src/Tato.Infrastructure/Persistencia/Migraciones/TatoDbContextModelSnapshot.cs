@@ -263,6 +263,81 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
                     b.ToTable("Fotos", (string)null);
                 });
 
+            modelBuilder.Entity("Tato.Domain.Portfolio.PaginaPublica", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("ActualizadaEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Bio")
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<DateTimeOffset>("CreadaEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Direccion")
+                        .IsRequired()
+                        .HasMaxLength(40)
+                        .HasColumnType("nvarchar(40)");
+
+                    b.Property<Guid>("EstudioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Horarios")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Instagram")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<string>("Sobre")
+                        .HasMaxLength(2200)
+                        .HasColumnType("nvarchar(2200)");
+
+                    b.Property<Guid?>("TatuadorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Ubicacion")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<bool>("Visible")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("WhatsApp")
+                        .HasMaxLength(16)
+                        .HasColumnType("nvarchar(16)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Direccion")
+                        .IsUnique();
+
+                    b.HasIndex("EstudioId")
+                        .IsUnique()
+                        .HasFilter("[TatuadorId] IS NULL");
+
+                    b.HasIndex("TatuadorId")
+                        .IsUnique()
+                        .HasFilter("[TatuadorId] IS NOT NULL");
+
+                    b.ToTable("PaginasPublicas", (string)null);
+                });
+
             modelBuilder.Entity("Tato.Domain.Portfolio.Publicacion", b =>
                 {
                     b.Property<Guid>("Id")
