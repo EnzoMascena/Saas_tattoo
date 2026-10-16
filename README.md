@@ -5,6 +5,7 @@ Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 La primera entrega es el **blog y portfolio público** de cada estudio. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend completo del panel de publicaciones con fotos. Sigue: el front del panel.
 
 ---
 
@@ -32,10 +33,11 @@ Cada estudio que usa la plataforma es un *tenant* aislado: sus usuarios, conteni
 
 | Capa | Tecnología |
 | --- | --- |
-| Backend | ASP.NET Core Web API con controladores · .NET 10 LTS · OpenAPI nativo + Scalar |
+| Backend | ASP.NET Core Web API con controladores · .NET 10 LTS · OpenAPI nativo |
 | Datos | SQL Server 2025 · EF Core 10, code-first con migraciones |
-| Autenticación | ASP.NET Core Identity con cookie HttpOnly |
-| Validación | FluentValidation para la entrada; las reglas de negocio viven en el dominio |
+| Autenticación | ASP.NET Core Identity con cookie HttpOnly · token antiforgery en los pedidos que modifican datos |
+| Validación | El dominio valida los datos y las reglas de negocio; la API traduce cada error a ProblemDetails. FluentValidation se suma si la validación de entrada crece |
+| Fotos | NetVips (libvips): WebP sin metadatos en tres tamaños. `NetVips.Native` trae libvips, no hay que instalar nada aparte |
 | Frontend | React 19.2 + TypeScript · Vite 8 · Node 24 LTS · pnpm |
 | Interfaz | Tailwind CSS + shadcn/ui |
 | Front: ruteo, datos y formularios | React Router · TanStack Query · React Hook Form + Zod |
@@ -72,9 +74,10 @@ flowchart LR
 
 - **El dominio no conoce nada externo**: ni EF Core, ni ASP.NET, ni proveedores. Habla con puertos; la infraestructura los implementa con adaptadores.
 - **Un módulo no toca las tablas ni las clases internas de otro**: se comunica con casos de uso o eventos. Los tests de arquitectura lo verifican y la CI falla si alguien lo rompe.
-- **Multi-tenancy** (D-42): una sola base con `EstudioId` en todas las tablas del estudio. El estudio sale de la sesión autenticada, nunca de un dato que mande el navegador. Filtros de consulta con nombre de EF Core más Row-Level Security de SQL Server como segunda línea de defensa.
+- **Multi-tenancy** (D-42): una sola base con `EstudioId` en todas las tablas del estudio. El estudio sale de la sesión autenticada, nunca de un dato que mande el navegador. Filtros de consulta con nombre de EF Core, más un control en `SaveChanges` que impide guardar datos de otro estudio. Row-Level Security de SQL Server, como segunda línea de defensa, está pendiente.
 - **Fechas en UTC** (D-43): se muestran en la zona horaria del estudio (`America/Argentina/Buenos_Aires` por defecto), en formato dd/mm/aaaa y 24 h. El reloj se obtiene siempre de `TimeProvider`, nunca de `DateTime.Now`.
-- **Concurrencia optimista**: las entidades que editan varios usuarios llevan `rowversion`.
+- **Concurrencia optimista**: las entidades que editan varios usuarios llevan `rowversion`, a nivel de agregado. El panel recibe la `version` al abrir, la devuelve al guardar y, si alguien guardó antes, recibe un 409 en lugar de pisar su cambio.
+- **Archivos y base de acuerdo**: al subir, primero los archivos y después la base; al quitar, al revés. Si algo falla en el medio, no quedan filas que apunten a archivos inexistentes.
 - **Sin borrados operativos**: el contenido cambia de estado (por ejemplo, Publicada → Oculta) y queda en el historial.
 
 ### Módulos
@@ -94,6 +97,60 @@ WhatsApp, Instagram y Facebook no ejecutan JavaScript para armar la vista previa
 
 ---
 
+## API del panel
+
+Todo exige sesión, y todo es del estudio de la sesión. Los pedidos que modifican datos (`POST`, `PUT`, `PATCH`, `DELETE`) exigen además el token antiforgery en el encabezado `X-XSRF-TOKEN`.
+
+### Sesión
+
+| Método | Ruta | Qué hace |
+| --- | --- | --- |
+| `GET` | `/api/auth/antiforgery` | Entrega el token antiforgery. Se pide al cargar el panel y otra vez después de iniciar o cerrar sesión |
+| `POST` | `/api/auth/login` | Inicia sesión (`204`). Límite de 5 intentos por minuto por IP |
+| `POST` | `/api/auth/logout` | Cierra la sesión |
+| `GET` | `/api/auth/yo` | Usuario logueado, su estudio y sus roles |
+
+### Publicaciones y fotos
+
+| Método | Ruta | Qué hace |
+| --- | --- | --- |
+| `GET` | `/api/publicaciones?estado=&pagina=&tamanio=` | «Mis publicaciones», de la modificada más recientemente a la más vieja |
+| `GET` | `/api/publicaciones/{id}` | Detalle, con sus fotos en orden y su `version` |
+| `POST` | `/api/publicaciones` | Crea en Borrador (`201`) |
+| `PUT` | `/api/publicaciones/{id}` | Reemplaza los datos (manda el formulario completo y la `version`) |
+| `POST` | `/api/publicaciones/{id}/consentimiento` | Confirma el consentimiento del cliente (RN-BLG-03) |
+| `POST` | `/api/publicaciones/{id}/publicar` | La publica: necesita fotos y consentimiento. Solo Dueño o Administrativo |
+| `POST` | `/api/publicaciones/{id}/ocultar` | La saca del sitio sin borrarla (RN-BLG-06). Solo Dueño o Administrativo |
+| `POST` | `/api/publicaciones/{id}/fotos` | Sube una foto (`multipart/form-data`: `archivo` y `version`) |
+| `POST` | `/api/publicaciones/{id}/fotos/{fotoId}/quitar` | Quita la foto y borra sus archivos |
+| `PUT` | `/api/publicaciones/{id}/fotos/orden` | Reordena: la primera queda como portada |
+| `POST` | `/api/publicaciones/{id}/fotos/{fotoId}/portada` | Pone esa foto primera |
+| `GET` | `/api/fotos/{fotoId}/{tamanio}` | Devuelve la versión `miniatura`, `galeria` o `detalle` en WebP |
+
+Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para seguir editando sin recargar.
+
+### Permisos (P-21)
+
+| Rol | Crear | Editar | Publicar y ocultar |
+| --- | --- | --- | --- |
+| Dueño y Administrativo | Sí | Todas | Sí |
+| Tatuador | Sí | Solo las que creó | No |
+
+### Errores
+
+Todos los errores llegan como ProblemDetails (RFC 9457), con un `detail` que se le puede mostrar a la persona.
+
+| Código | Cuándo |
+| --- | --- |
+| `400` | Datos mal formados o foto que no se puede usar |
+| `401` | Sin sesión |
+| `403` | El rol no permite la operación |
+| `404` | No existe o es de otro estudio (las dos cosas se responden igual) |
+| `409` | Alguien la modificó desde que se abrió: recargar y volver a intentar |
+| `422` | Una regla de negocio no lo permite. Trae `regla` con el código, por ejemplo `"RN-BLG-03"` |
+
+---
+
 ## Estructura del repositorio
 
 ```
@@ -106,25 +163,26 @@ tato-saas/
 │   │   ├── Tato.Domain/
 │   │   ├── Tato.Application/
 │   │   ├── Tato.Infrastructure/
-│   │   └── Tato.Api/
+│   │   └── Tato.Api/                # archivos/: fotos guardadas en desarrollo (fuera de git)
 │   └── tests/
 │       ├── Tato.Domain.Tests/
 │       ├── Tato.IntegrationTests/   # xUnit + Testcontainers, contra SQL Server real
 │       └── Tato.ArchitectureTests/  # dependencias y fronteras entre módulos
 ├── frontend/
 │   ├── pnpm-workspace.yaml
+│   ├── .nvmrc                       # Node 24
 │   ├── apps/
 │   │   ├── sitio/                   # sitio público del estudio (www)
 │   │   └── panel/                   # panel privado (subdominio panel); crece hasta ser la app del MVP
-│   └── packages/
+│   └── packages/                    # pendiente
 │       ├── ui/                      # componentes compartidos (Tailwind + shadcn/ui)
 │       └── api-client/              # cliente generado desde OpenAPI
-├── docs/                            # requerimientos (docs 01 a 07) y planillas
-├── .github/                         # CI y Dependabot
-├── .editorconfig
-├── .nvmrc                           # Node 24
+├── docs/                            # pendiente: requerimientos (docs 01 a 07) y planillas
+├── .github/                         # pendiente: CI y Dependabot
 └── README.md
 ```
+
+Lo marcado como pendiente todavía no existe en el repositorio.
 
 En el front, el código de cada app se organiza por funcionalidad (`src/features/publicaciones`, `src/features/disenos`, …), no por tipo de archivo.
 
@@ -155,9 +213,15 @@ dotnet user-secrets set "ConnectionStrings:Tato" \
 # Crear o actualizar la base
 dotnet ef database update --project src/Tato.Infrastructure --startup-project src/Tato.Api
 
-# Levantar la API (la documentación interactiva de Scalar queda disponible en desarrollo)
-dotnet run --project src/Tato.Api
+# Dar de alta el estudio y sus usuarios (en la versión 1 no hay registro, P-19)
+dotnet run --project src/Tato.Api -- alta-estudio
+dotnet run --project src/Tato.Api -- alta-usuario
+
+# Levantar la API con HTTPS: las cookies de sesión (__Host-) solo viajan por HTTPS
+dotnet run --project src/Tato.Api --launch-profile https
 ```
+
+La API queda en `https://localhost:7239`. En desarrollo, el documento OpenAPI está en `/openapi/v1.json`, y las fotos se guardan en `src/Tato.Api/archivos/`.
 
 ### Frontend
 
@@ -179,6 +243,8 @@ cd backend && dotnet test    # requiere Docker corriendo (Testcontainers)
 cd frontend && pnpm test
 ```
 
+Los tests de integración levantan un SQL Server 2025 en Docker. Para usar uno ya instalado, cargá su cadena de conexión en la variable `TATO_TESTS_SQLSERVER`: cada corrida crea una base nueva con nombre único y la borra al terminar, así nunca toca la de desarrollo.
+
 ---
 
 ## Configuración
@@ -186,7 +252,7 @@ cd frontend && pnpm test
 Nada hardcodeado (D-34):
 
 - **Parámetros de negocio**: viven en la configuración de cada estudio, en la base, con valores por defecto (por ejemplo, el máximo de fotos por publicación, 10 por defecto). Nunca en el código.
-- **Parámetros técnicos**: `appsettings.json` tipados con el patrón Options.
+- **Parámetros técnicos**: `appsettings.json` tipados con el patrón Options y validados al arrancar: con una configuración imposible, la API no levanta. Por ejemplo, `Fotos` (peso y píxeles máximos, lado de cada tamaño, calidad de WebP) y `Almacenamiento:Disco:CarpetaRaiz`.
 - **Secretos**: nunca en el repositorio. `dotnet user-secrets` en desarrollo; variables de entorno en producción.
 - **Front**: variables en `.env.local` (ignorado por git), con un `.env.example` versionado como referencia. Todo lo que llega al front es público: ahí no van secretos.
 
@@ -215,8 +281,14 @@ docs: cerrar P-18 con el hosting elegido
 ## Hoja de ruta de la versión 1
 
 - [ ] **Semana 1** (5 al 11/10): repositorio, entorno, hosting y dominio (corte 0)
+  - [x] Repositorio y entorno
+  - [ ] Hosting y dominio (P-18)
 - [ ] **Semana 2** (12 al 18/10): login, estudios, usuarios y aislamiento por estudio (corte 1) · primer despliegue
+  - [x] Login, estudios, usuarios y aislamiento por estudio
+  - [ ] Primer despliegue
 - [ ] **Semana 3** (19 al 25/10): panel de publicaciones, con subida y optimización de fotos
+  - [x] Backend del panel: publicaciones, permisos, control de versión y fotos
+  - [ ] Front del panel
 - [ ] **Semana 4** (26/10 al 1/11): sitio público: inicio, galería, detalle y contacto por WhatsApp
 - [ ] **Semana 5** (2 al 8/11): diseños, tatuadores, vistas previas y SEO
 - [ ] **Semana 6** (9 al 15/11): carga del contenido real, pruebas en celulares y ajustes, sin funciones nuevas
