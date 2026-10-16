@@ -4,6 +4,7 @@ using Tato.Domain.Portfolio;
 using Tato.Infrastructure.Estudios;
 using Tato.Infrastructure.Persistencia;
 using Tato.Infrastructure.Portfolio;
+using UsuarioDelEstudio = Tato.Domain.Estudios.Usuario;
 
 namespace Tato.IntegrationTests.Portfolio;
 
@@ -59,6 +60,27 @@ internal sealed class Panel
     /// </summary>
     public Panel Como(UsuarioFalso usuario) => new(_baseDeDatos, _estudio, usuario, Almacenamiento);
 
+    /// <summary>
+    /// Da de alta en el estudio a un artista: un usuario con el rol Tatuador (y Dueño, si se pide) y su perfil,
+    /// como lo hace el comando alta-usuario. Devuelve su sesión con el perfil, como la arma la cookie al iniciar
+    /// sesión.
+    /// </summary>
+    public async Task<UsuarioFalso> CrearArtistaAsync(bool esDuenio = true)
+    {
+        var roles = esDuenio ? Rol.Duenio | Rol.Tatuador : Rol.Tatuador;
+        var usuario = UsuarioDelEstudio.Crear(EstudioId, $"{Guid.NewGuid():N}@tato.test", "Artista de prueba", roles);
+        var tatuador = Tatuador.Crear(usuario, $"Artista {Guid.NewGuid():N}");
+
+        await using (var db = Contexto())
+        {
+            db.Usuarios.Add(usuario);
+            db.Tatuadores.Add(tatuador);
+            await db.SaveChangesAsync();
+        }
+
+        return new UsuarioFalso(usuario.Id, esDuenio, EsAdministrativo: false, TatuadorId: tatuador.Id);
+    }
+
     public Task<Guid> CrearPublicacionAsync(string titulo) => CrearPublicacionAsync(new DatosPublicacion(titulo));
 
     public async Task<Guid> CrearPublicacionAsync(DatosPublicacion datos)
@@ -68,11 +90,24 @@ internal sealed class Panel
         return await crear.EjecutarAsync(datos);
     }
 
-    public async Task<string> EditarAsync(Guid id, string titulo, string version)
+    /// <summary>
+    /// Edita solo el título. Ojo: los demás datos quedan vacíos, incluida la página (la deja en la del estudio).
+    /// </summary>
+    public Task<string> EditarAsync(Guid id, string titulo, string version) =>
+        EditarAsync(id, new DatosPublicacion(titulo), version);
+
+    public async Task<string> EditarAsync(Guid id, DatosPublicacion datos, string version)
     {
         await using var db = Contexto();
         var editar = new EditarPublicacion(new RepositorioPublicaciones(db), Referencias(db), Usuario, Reloj);
-        return await editar.EjecutarAsync(id, new DatosPublicacion(titulo), version);
+        return await editar.EjecutarAsync(id, datos, version);
+    }
+
+    public async Task<string> ConfirmarConsentimientoAsync(Guid id, string version)
+    {
+        await using var db = Contexto();
+        var acciones = new AccionesPublicacion(new RepositorioPublicaciones(db), Usuario, Reloj);
+        return await acciones.ConfirmarConsentimientoAsync(id, version);
     }
 
     public async Task<string> PublicarAsync(Guid id, string version)

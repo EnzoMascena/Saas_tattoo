@@ -48,7 +48,7 @@ public sealed class AccionesPublicacion
     public Task<string> PublicarAsync(Guid id, string version, CancellationToken cancellationToken = default) =>
         AplicarAsync(id, version, (publicacion, ahora) =>
         {
-            PermisosPublicaciones.ExigirPublicarUOcultar(_usuarioActual);
+            PermisosPublicaciones.ExigirPublicarUOcultar(_usuarioActual, publicacion);
             publicacion.Publicar(ahora);
         }, cancellationToken);
 
@@ -58,7 +58,7 @@ public sealed class AccionesPublicacion
     public Task<string> OcultarAsync(Guid id, string version, CancellationToken cancellationToken = default) =>
         AplicarAsync(id, version, (publicacion, ahora) =>
         {
-            PermisosPublicaciones.ExigirPublicarUOcultar(_usuarioActual);
+            PermisosPublicaciones.ExigirPublicarUOcultar(_usuarioActual, publicacion);
             publicacion.Ocultar(ahora);
         }, cancellationToken);
 

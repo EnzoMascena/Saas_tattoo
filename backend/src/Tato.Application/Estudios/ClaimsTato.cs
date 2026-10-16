@@ -15,4 +15,9 @@ public static class ClaimsTato
     /// Nombre del usuario, para mostrarlo en el panel.
     /// </summary>
     public const string Nombre = "nombre";
+
+    /// <summary>
+    /// Perfil de tatuador del usuario, si tiene el rol Tatuador. Define cuál es su página pública (D-51).
+    /// </summary>
+    public const string TatuadorId = "tatuador_id";
 }

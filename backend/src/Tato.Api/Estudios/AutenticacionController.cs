@@ -71,7 +71,8 @@ public sealed class AutenticacionController : ControllerBase
             User.FindFirstValue(ClaimTypes.Email) ?? string.Empty,
             User.FindFirstValue(ClaimsTato.Nombre) ?? string.Empty,
             Guid.Parse(estudioId),
-            User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray());
+            User.FindAll(ClaimTypes.Role).Select(c => c.Value).ToArray(),
+            Guid.TryParse(User.FindFirstValue(ClaimsTato.TatuadorId), out var tatuadorId) ? tatuadorId : null);
     }
 }
 
@@ -83,7 +84,7 @@ public sealed record SolicitudLogin(string Email, string Password);
 /// <summary>
 /// Quién es el usuario de la sesión actual, para el panel.
 /// </summary>
-public sealed record UsuarioActualRespuesta(Guid Id, string Email, string Nombre, Guid EstudioId, string[] Roles);
+public sealed record UsuarioActualRespuesta(Guid Id, string Email, string Nombre, Guid EstudioId, string[] Roles, Guid? TatuadorId);
 
 /// <summary>
 /// Token antiforgery y el encabezado en el que hay que mandarlo.

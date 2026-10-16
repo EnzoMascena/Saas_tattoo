@@ -8,7 +8,7 @@ namespace Tato.IntegrationTests.Portfolio;
 /// <summary>
 /// Reemplaza a la sesión: un usuario con los roles que elige cada test.
 /// </summary>
-internal sealed record UsuarioFalso(Guid? UsuarioId, bool EsDuenio, bool EsAdministrativo) : IUsuarioActual
+internal sealed record UsuarioFalso(Guid? UsuarioId, bool EsDuenio, bool EsAdministrativo, Guid? TatuadorId = null) : IUsuarioActual
 {
     public static UsuarioFalso Duenio() => new(Guid.NewGuid(), EsDuenio: true, EsAdministrativo: false);
 
