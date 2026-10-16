@@ -4,7 +4,7 @@ Requerimientos de la primera entrega: las páginas públicas del estudio y de su
 
 | Versión | Fecha | Estado | Relacionados |
 | --- | --- | --- | --- |
-| 2.0 | 16 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
+| 2.1 | 16 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
 
 > **Prioridad (D-46):** el blog es la primera entrega y tiene que estar online antes del **17 de noviembre de 2026**, cuando la tatuadora del estudio piloto viaja a tatuar a Bolivia. El MVP de gestión sigue después.
 
@@ -91,7 +91,7 @@ Los datos de cada página (nombre, bio, foto, contacto y «Sobre») los edita su
 | --- | --- | --- |
 | Publicación | Tipo (Trabajo o Blog), título, texto de hasta 2200 caracteres, de 1 a 10 fotos (la primera es la portada), fijada, estado (Borrador, Publicada u Oculta) y consentimiento (quién lo confirmó y cuándo). | Va a la página de su artista; sin artista, a la del estudio (RN-BLG-12). Nunca guarda datos del cliente. Estilo, zona del cuerpo y fecha del trabajo ya existen en el modelo, pero el front de la versión 1 no los usa. |
 | Foto | Tres versiones optimizadas (miniatura, galería y detalle), orden, ancho y alto. | Implementada en el corte 2 (doc 04). |
-| Página pública | Dirección, nombre, bio corta, foto o logo, Instagram, WhatsApp, y el texto y la foto de «Sobre». En la del estudio, además, la ubicación y los horarios. | Una por estudio y una por artista. Propuesta en el doc 04. |
+| Página pública | Dirección, nombre, bio corta, foto o logo, Instagram, WhatsApp, y el texto y la foto de «Sobre». En la del estudio, además, la ubicación y los horarios. | Una por estudio y una por artista. Implementada, salvo la foto o logo y la foto de «Sobre» (R-16, doc 04). |
 
 ---
 
@@ -155,12 +155,12 @@ Si otra persona modificó la publicación mientras se editaba, el panel muestra 
 | RN-BLG-04 | Para publicar hace falta al menos una foto, y la primera es la portada. Una publicación publicada no puede quedarse sin fotos. El máximo es configurable por estudio, con 10 por defecto. | Implementada |
 | RN-BLG-05 | Las fotos se optimizan al subirlas: miniatura, galería y detalle, en WebP y sin metadatos. El sitio nunca sirve los originales. | Implementada |
 | RN-BLG-06 | Ocultar no borra: la publicación cambia de estado, como en el resto del sistema (RN-VIS-06). | Implementada |
-| RN-BLG-07 | Cada página pública tiene una dirección única en toda la plataforma. Se arma con el nombre que elige cada uno, en minúsculas, sin tildes ni espacios. Si después cambia el nombre, la dirección no cambia sola, para no romper los links ya compartidos: se cambia a propósito desde el panel. | Ampliada en la 2.0 (antes era una por estudio) · por implementar |
+| RN-BLG-07 | Cada página pública tiene una dirección única en toda la plataforma. Se arma con el nombre que elige cada uno, en minúsculas, sin tildes ni espacios. Si después cambia el nombre, la dirección no cambia sola, para no romper los links ya compartidos: se cambia a propósito desde el panel. | Ampliada en la 2.0 (antes era una por estudio) · Implementada |
 | RN-BLG-08 | Los botones de contacto abren WhatsApp con un mensaje que identifica el trabajo. | Postergada: después de la versión 1 |
 | RN-BLG-09 | Quién publica. | Reemplazada por los permisos por página (D-51) |
 | RN-BLG-10 | Versión 2: «Publicar en blog» desde un tatuaje Finalizado del MVP crea una publicación en borrador con sus fotos y datos, sin datos del cliente (RN-TAT-11). | Versión 2 |
-| RN-BLG-11 | El texto de una publicación tiene hasta 2200 caracteres, el mismo límite que Instagram. | Nueva · por implementar (hoy el límite es 2000) |
-| RN-BLG-12 | Una publicación va a la página de su artista; sin artista, a la del estudio. Cada página muestra solo sus propias publicaciones. | Nueva · por implementar |
+| RN-BLG-11 | El texto de una publicación tiene hasta 2200 caracteres, el mismo límite que Instagram. | Implementada |
+| RN-BLG-12 | Una publicación va a la página de su artista; sin artista, a la del estudio. Cada página muestra solo sus propias publicaciones. | En parte: el panel ya asigna cada publicación a su página; falta el sitio |
 | RN-BLG-13 | Las publicaciones fijadas aparecen primero; las demás, de la publicada más recientemente a la más vieja. | Nueva · por implementar |
 
 ---
@@ -186,7 +186,7 @@ La misma que el MVP (D-47).
 | --- | --- | --- | --- |
 | 1 | 5 al 11 de octubre | Repositorio y entorno (corte 0). Hosting y dominio (P-18). | Repositorio listo. Hosting y dominio pendientes. |
 | 2 | 12 al 18 de octubre | Login, estudios, usuarios y aislamiento (corte 1). Primer despliegue. | Corte 1 listo, y también el backend del panel (corte 2), adelantado. Despliegue pendiente. |
-| 3 | 19 al 25 de octubre | Ajustar el backend a esta versión: tipo de publicación, texto de 2200 caracteres, permisos por página, páginas públicas y endpoints públicos. Wireframe navegable. Front del panel. | — |
+| 3 | 19 al 25 de octubre | Ajustar el backend a esta versión: tipo de publicación, texto de 2200 caracteres, permisos por página, páginas públicas y endpoints públicos. Wireframe navegable. Front del panel. | Adelantado: tipo, 2200 caracteres, permisos por página y páginas públicas en el panel. Siguen los endpoints públicos. |
 | 4 | 26 de octubre al 1 de noviembre | Sitio público: las páginas, sus pestañas y el detalle de cada publicación. | — |
 | 5 | 2 al 8 de noviembre | Diseño visual de cada página, vistas previas y SEO. | — |
 | 6 | 9 al 15 de noviembre | Carga del contenido real, pruebas en celulares y ajustes. No se suman funciones nuevas. | — |
@@ -256,5 +256,6 @@ Salen del Instagram de cada uno. Se usan en la etapa de diseño, después de apr
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
+| 2.1 | 16/10/2026 | Estado de las reglas: RN-BLG-07 y RN-BLG-11 implementadas; RN-BLG-12, en parte. La Página pública, implementada en el backend sin sus fotos. |
 | 2.0 | 16/10/2026 | Se cierran las preguntas de la 1.0 y el alcance se achica a un portfolio parecido a Instagram, con páginas por estudio y por artista. Decisiones D-48 a D-56. Reglas RN-BLG-11 a RN-BLG-13; RN-BLG-07 ampliada, RN-BLG-08 postergada y RN-BLG-09 reemplazada. Pasa a Markdown, en `docs/` del repositorio. |
 | 1.0 | 4/10/2026 | Borrador inicial para discutir. |

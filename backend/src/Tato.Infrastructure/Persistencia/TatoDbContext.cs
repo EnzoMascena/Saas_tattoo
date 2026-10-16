@@ -49,6 +49,11 @@ public sealed class TatoDbContext : IdentityUserContext<CuentaUsuario, Guid>
     public DbSet<Publicacion> Publicaciones => Set<Publicacion>();
 
     /// <summary>
+    /// Páginas públicas del estudio y de sus artistas (D-49).
+    /// </summary>
+    public DbSet<PaginaPublica> PaginasPublicas => Set<PaginaPublica>();
+
+    /// <summary>
     /// Estudio de la sesión. El filtro lo lee en cada consulta, del contexto que la ejecuta.
     /// </summary>
     private Guid? EstudioIdActual => _estudioActual.EstudioId;

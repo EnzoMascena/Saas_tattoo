@@ -13,7 +13,7 @@ namespace Tato.IntegrationTests.Portfolio;
 /// estudio y un usuario. Cada operación usa un contexto nuevo, como cada pedido HTTP: así la concurrencia se
 /// prueba de verdad, porque ningún contexto ve lo que tiene en memoria otro.
 /// </summary>
-internal sealed class Panel
+internal sealed partial class Panel
 {
     private readonly BaseDeDatosFixture _baseDeDatos;
     private readonly EstudioFalso _estudio;

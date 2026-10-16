@@ -4,9 +4,9 @@ Entidades, atributos, relaciones y puntos a revisar.
 
 | Versión | Fecha | Estado | Relacionados |
 | --- | --- | --- | --- |
-| 1.3 | 16 de octubre de 2026 | Versión 1 implementada · MVP en borrador, pendiente de revisión (P-01) | Docs 02, 03, 05, 06 y 07 |
+| 1.4 | 16 de octubre de 2026 | Versión 1 implementada · MVP en borrador, pendiente de revisión (P-01) | Docs 02, 03, 05, 06 y 07 |
 
-> **Estado:** la parte de la versión 1 (blog y base del sistema, sección 2) refleja lo implementado en los cortes 1 y 2. La Página pública es una propuesta. La parte del MVP (sección 3) sigue en borrador y pendiente de revisión (P-01): es un punto de partida para la discusión, no el diseño final. Las reglas de negocio de los documentos 02, 03 y 07 tienen prioridad sobre este documento.
+> **Estado:** la parte de la versión 1 (blog y base del sistema, sección 2) refleja lo implementado en los cortes 1 y 2. La Página pública está implementada, salvo sus dos fotos (R-16). La parte del MVP (sección 3) sigue en borrador y pendiente de revisión (P-01): es un punto de partida para la discusión, no el diseño final. Las reglas de negocio de los documentos 02, 03 y 07 tienen prioridad sobre este documento.
 
 > **Novedades de la versión 1.3:**
 > - Las entidades de la versión 1, tal como quedaron implementadas: Estudio, Usuario, CuentaUsuario, Tatuador, Estilo, ZonaCuerpo, Publicación y Foto.
@@ -47,8 +47,8 @@ erDiagram
     TATUADOR |o--o{ PUBLICACION : "es la página de"
     ESTILO |o--o{ PUBLICACION : clasifica
     ZONA_CUERPO |o--o{ PUBLICACION : ubica
-    ESTUDIO ||--o{ PAGINA_PUBLICA : "tiene (propuesta)"
-    TATUADOR |o--o| PAGINA_PUBLICA : "tiene (propuesta)"
+    ESTUDIO ||--o{ PAGINA_PUBLICA : "tiene"
+    TATUADOR |o--o| PAGINA_PUBLICA : "tiene"
 
     ESTUDIO {
         uuid id PK
@@ -150,9 +150,9 @@ erDiagram
 | Estilo y ZonaCuerpo | id, estudio_id, nombre (hasta 50, único dentro del estudio), activo | Catálogos por estudio: cada uno arranca con 13 estilos y 16 zonas, y después los adapta. No se borran: se desactivan (R-11). | Implementadas |
 | Publicación | id, estudio_id, tipo (Trabajo o Blog), titulo (hasta 120), descripcion (hasta 2200), fecha_trabajo, estilo_id, zona_cuerpo_id, tatuador_id, destacada, estado (Borrador, Publicada u Oculta), consentimiento_confirmado_por, consentimiento_confirmado_en, creada_por, creada_en, actualizada_en, publicada_en, version | tatuador_id indica la página de destino; vacío, es la del estudio (RN-BLG-12). destacada es «fijada» (RN-BLG-13). publicada_en guarda la primera vez que se publicó: no cambia al ocultar y volver a publicar. | Implementada. El tipo y el texto de 2200 caracteres, por implementar (hoy el límite es 2000). |
 | Foto | id, estudio_id, publicacion_id, orden (0 es la portada), ancho, alto, subida_en | Solo se cambia a través de su Publicación. El ancho y el alto son los de la versión de detalle. | Implementada |
-| Página pública | id, estudio_id, tatuador_id, direccion, nombre, bio, foto, instagram, whatsapp, sobre_texto, sobre_foto, ubicacion, horarios, visible, version | Una por estudio (tatuador_id vacío) y una por artista. Detalle en la sección 2.3. | Propuesta |
+| Página pública | id, estudio_id, tatuador_id, direccion, nombre, bio, foto, instagram, whatsapp, sobre_texto, sobre_foto, ubicacion, horarios, visible, version | Una por estudio (tatuador_id vacío) y una por artista. Detalle en la sección 2.3. | Implementada, sin foto ni sobre_foto (R-16) |
 
-### 2.3 Página pública (propuesta)
+### 2.3 Página pública
 
 | Atributo | Regla |
 | --- | --- |
@@ -185,8 +185,8 @@ Lo que muestra la pestaña «Sobre» se arma con estas relaciones, sin datos ext
 | Publicación — Foto | 1 a N | Hasta el máximo del estudio (10 por defecto). Para publicar hace falta al menos una (RN-BLG-04). |
 | Tatuador — Publicación | 0..1 a N | La página de destino. |
 | Estilo / ZonaCuerpo — Publicación | 0..1 a N | Opcionales. El front de la versión 1 no los usa. |
-| Estudio — Página pública | 1 a N | Propuesta: una del estudio y una por artista. |
-| Tatuador — Página pública | 1 a 0..1 | Propuesta. |
+| Estudio — Página pública | 1 a N | Una del estudio y una por artista. |
+| Tatuador — Página pública | 1 a 0..1 | |
 
 ---
 
@@ -339,6 +339,7 @@ erDiagram
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
+| 1.4 | 16/10/2026 | Página pública implementada (tabla PaginasPublicas), sin sus fotos (R-16). |
 | 1.3 | 16/10/2026 | Entidades de la versión 1 tal como quedaron implementadas en los cortes 1 y 2. Propuesta de Página pública. Tipo de publicación y texto de 2200 caracteres (doc 07, 2.0). Se resuelven R-01, R-07, R-09, R-10 y R-11, R-04 en parte, y se suman R-14 a R-16. Diagramas en Mermaid. Pasa a Markdown, en `docs/` del repositorio. |
 | 1.1 y 1.2 | 4/10/2026 | Principios de configuración por estudio, fechas en UTC (D-43) y concurrencia optimista. El aislamiento por estudio queda decidido (D-42). Entidades propuestas y puntos R-09 a R-13. |
 | 1.0 | 3/10/2026 | Modelo inicial en borrador. |
