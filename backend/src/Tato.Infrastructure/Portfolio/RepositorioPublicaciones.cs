@@ -40,11 +40,17 @@ internal sealed class RepositorioPublicaciones : IRepositorioPublicaciones
         string versionEsperada,
         CancellationToken cancellationToken)
     {
-        var version = _db.Entry(publicacion).Property<byte[]>(PublicacionConfiguration.ColumnaVersion);
+        var entrada = _db.Entry(publicacion);
+        var version = entrada.Property<byte[]>(PublicacionConfiguration.ColumnaVersion);
 
         // EF compara contra el valor original. Por defecto es el que acaba de leer; lo reemplazamos por el que
         // tenía el panel, para detectar también los cambios que pasaron mientras la persona editaba.
         version.OriginalValue = DesdeBase64(versionEsperada);
+
+        // EF solo actualiza la fila de la publicación si cambió alguna de sus columnas, y sin ese UPDATE la versión
+        // no se compara. Si solo cambiaron las fotos (subir, quitar, reordenar) y la hora coincide, se saltearía el
+        // control. Por eso la fila raíz del agregado se actualiza siempre: la versión se controla en todo guardado.
+        entrada.Property(p => p.ActualizadaEn).IsModified = true;
 
         try
         {
