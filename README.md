@@ -2,10 +2,10 @@
 
 Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 
-La primera entrega es el **blog y portfolio público** de cada estudio. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
+La primera entrega es el **blog y portfolio público**: una página parecida a un perfil de Instagram para cada estudio y para cada artista. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
-> Listo: login, estudios, usuarios, aislamiento por estudio y el backend completo del panel de publicaciones con fotos. Sigue: el front del panel.
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel de publicaciones con fotos. Sigue: ajustar el backend al alcance del doc 07 (versión 2.0), el wireframe y el front del panel.
 
 ---
 
@@ -15,14 +15,22 @@ Cada estudio que usa la plataforma es un *tenant* aislado: sus usuarios, conteni
 
 ### Versión 1 · Blog y portfolio
 
-- **Sitio público** del estudio: inicio, galería de trabajos con filtros, detalle de cada trabajo, diseños disponibles, perfiles de tatuadores y contacto por WhatsApp e Instagram.
-- **Panel privado** con login, diseñado primero para el celular: publicaciones, diseños y perfiles del estudio y de los tatuadores.
+- **Páginas públicas** del estudio y de cada artista, independientes y con la misma estructura. Cada una tiene su dirección (por ejemplo, `/inkmortal`) y un encabezado como el de Instagram: foto o logo, nombre, bio y links a Instagram y WhatsApp.
+- **Tres pestañas** en cada página:
+  - **Trabajos:** una grilla de fotos.
+  - **Blog:** publicaciones con más texto.
+  - **Sobre mí / Sobre nosotros:** la del estudio muestra a sus artistas, y la de cada artista enlaza a su estudio.
+- **Publicaciones** de tipo Trabajo o Blog, con hasta 10 fotos y 2200 caracteres de texto, como en Instagram.
+- **Panel privado** con login, diseñado primero para el celular: publicaciones con fotos y los datos de cada página. Cada artista gestiona su página, y los Dueños, la del estudio.
 - **Fotos optimizadas** al subirlas (tamaño de galería, de detalle y miniatura). El sitio nunca sirve los originales.
 - **Vistas previas y SEO**: cada página pública sale con título, descripción y foto (Open Graph), más un sitemap.
 - **Base del sistema**: login, estudios, usuarios y aislamiento por estudio, que después reutiliza el MVP.
 
+El alcance completo, con las pantallas y las reglas, está en el [doc 07](docs/07_Blog_y_Portfolio_Publico.md).
+
 ### Después
 
+- Del blog: diseños disponibles, fechas de viaje, videos, filtros de la galería y dominio propio por página.
 - MVP de gestión: Agenda y Turnos con señas, Clientes, Tatuajes, Sesiones con walk-ins y notificaciones in-app.
 - «Publicar en blog» desde un tatuaje finalizado, pedido de turno desde el sitio y alta de estudios por autoservicio.
 - Integraciones con Mercado Pago y WhatsApp.
@@ -85,7 +93,7 @@ flowchart LR
 | Módulo | Contenido | Entrega |
 | --- | --- | --- |
 | Estudios | Estudios (tenants), usuarios, roles, perfiles y configuración del estudio | v1 |
-| Portfolio | Publicaciones, diseños, perfiles públicos y fotos | v1 |
+| Portfolio | Publicaciones (trabajos y blog), fotos y páginas públicas | v1 |
 | Clientes · Agenda · Tatuajes · Notificaciones | Gestión operativa del estudio | MVP |
 | Pagos | Integración con Mercado Pago | Post-MVP |
 
@@ -129,12 +137,16 @@ Todo exige sesión, y todo es del estudio de la sesión. Los pedidos que modific
 
 Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para seguir editando sin recargar.
 
-### Permisos (P-21)
+### Permisos
+
+Implementado hoy (P-21):
 
 | Rol | Crear | Editar | Publicar y ocultar |
 | --- | --- | --- | --- |
 | Dueño y Administrativo | Sí | Todas | Sí |
 | Tatuador | Sí | Solo las que creó | No |
+
+Por implementar (D-51, doc 07): permisos por página. Cada artista gestiona su propia página y nadie más la edita. En la página del estudio sigue valiendo la tabla de arriba.
 
 ### Errores
 
@@ -177,7 +189,7 @@ tato-saas/
 │   └── packages/                    # pendiente
 │       ├── ui/                      # componentes compartidos (Tailwind + shadcn/ui)
 │       └── api-client/              # cliente generado desde OpenAPI
-├── docs/                            # pendiente: requerimientos (docs 01 a 07) y planillas
+├── docs/                            # requerimientos en Markdown (docs 04, 05 y 07 por ahora)
 ├── .github/                         # pendiente: CI y Dependabot
 └── README.md
 ```
@@ -229,9 +241,9 @@ La API queda en `https://localhost:7239`. En desarrollo, el documento OpenAPI es
 cd frontend
 pnpm install
 
-pnpm --filter sitio dev      # sitio público
-pnpm --filter panel dev      # panel privado
-pnpm api:generate            # regenera el cliente tipado desde el OpenAPI de la API
+pnpm dev:sitio               # sitio público
+pnpm dev:panel               # panel privado
+pnpm api:generate            # pendiente: regenera el cliente tipado desde el OpenAPI de la API
 ```
 
 En desarrollo, Vite hace de proxy de `/api` hacia la API, así la cookie de sesión es del mismo origen y no hace falta configurar CORS.
@@ -286,35 +298,40 @@ docs: cerrar P-18 con el hosting elegido
 - [ ] **Semana 2** (12 al 18/10): login, estudios, usuarios y aislamiento por estudio (corte 1) · primer despliegue
   - [x] Login, estudios, usuarios y aislamiento por estudio
   - [ ] Primer despliegue
-- [ ] **Semana 3** (19 al 25/10): panel de publicaciones, con subida y optimización de fotos
-  - [x] Backend del panel: publicaciones, permisos, control de versión y fotos
+  - [x] Backend del panel, adelantado: publicaciones, permisos, control de versión y fotos (corte 2)
+- [ ] **Semana 3** (19 al 25/10): ajustes del backend al doc 07, versión 2.0, wireframe y front del panel
+  - [ ] Tipo de publicación, texto de 2200 caracteres y permisos por página
+  - [ ] Páginas públicas y endpoints públicos
+  - [ ] Wireframe navegable del sitio y del panel
   - [ ] Front del panel
-- [ ] **Semana 4** (26/10 al 1/11): sitio público: inicio, galería, detalle y contacto por WhatsApp
-- [ ] **Semana 5** (2 al 8/11): diseños, tatuadores, vistas previas y SEO
+- [ ] **Semana 4** (26/10 al 1/11): sitio público: las páginas, sus pestañas y el detalle de cada publicación
+- [ ] **Semana 5** (2 al 8/11): diseño visual de cada página, vistas previas y SEO
 - [ ] **Semana 6** (9 al 15/11): carga del contenido real, pruebas en celulares y ajustes, sin funciones nuevas
 - [ ] **16/11**: margen
 
-Si el plan se atrasa, se recorta en este orden: diseños, filtros de la galería y perfiles de tatuadores. Lo indispensable es el inicio, la galería, el detalle, el contacto y el panel de carga.
+Si el plan se atrasa, se recorta en este orden: el diseño visual propio de cada página (se arranca con un tema común), la pestaña Blog y la pestaña «Sobre». Lo indispensable es el encabezado con contacto, la pestaña Trabajos, el detalle y el panel de carga.
 
 ---
 
 ## Despliegue
 
-Propuesta por defecto (P-18, ver `docs/`): un servidor virtual con SQL Server Express, Cloudflare adelante para DNS, CDN y HTTPS, y el dominio del estudio con el sitio en `www` y el panel en el subdominio `panel`. El primer despliegue se hace en la semana 2, para que los problemas del hosting aparezcan temprano.
+Propuesta por defecto (P-18, ver `docs/`): un servidor virtual con SQL Server Express y Cloudflare adelante para DNS, CDN y HTTPS, con un presupuesto de hasta 30.000 ARS por mes. El dominio es de la plataforma, con una ruta por página (D-52), y el panel va en el subdominio `panel`. El primer despliegue se hace cuanto antes, para que los problemas del hosting aparezcan temprano.
 
 ---
 
 ## Documentación
 
-| Documento | Contenido |
-| --- | --- |
-| 01 · Visión, alcance y roles | Qué es el producto, alcance, roles y matriz de permisos |
-| 02 · Reglas de negocio generales | Tatuajes, co-tatuadores, sesiones, visibilidad, clientes y notificaciones |
-| 03 · Módulo Agenda y Turnos | Calendario, señas, turnos, estados, reagendamientos y montos |
-| 04 · Modelo de datos | Entidades y relaciones (borrador) |
-| 05 · Decisiones, glosario y pendientes | Por qué se decidió cada cosa y temas abiertos |
-| 06 · Stack y arquitectura | Tecnologías, arquitectura, seguridad, escalabilidad y patrones |
-| 07 · Blog y portfolio público | Requerimientos de la primera entrega |
+| Documento | Contenido | Dónde |
+| --- | --- | --- |
+| 01 · Visión, alcance y roles | Qué es el producto, alcance, roles y matriz de permisos | Proyecto (PDF) |
+| 02 · Reglas de negocio generales | Tatuajes, co-tatuadores, sesiones, visibilidad, clientes y notificaciones | Proyecto (PDF) |
+| 03 · Módulo Agenda y Turnos | Calendario, señas, turnos, estados, reagendamientos y montos | Proyecto (PDF) |
+| 04 · Modelo de datos | Entidades y relaciones: la versión 1 implementada y el MVP en borrador | [docs/](docs/04_Modelo_de_Datos_BORRADOR.md) |
+| 05 · Decisiones, glosario y pendientes | Por qué se decidió cada cosa y temas abiertos | [docs/](docs/05_Decisiones_Glosario_y_Pendientes.md) |
+| 06 · Stack y arquitectura | Tecnologías, arquitectura, seguridad, escalabilidad y patrones | Proyecto (PDF) |
+| 07 · Blog y portfolio público | Alcance, pantallas y reglas de la primera entrega | [docs/](docs/07_Blog_y_Portfolio_Publico.md) |
+
+Los documentos pasan a Markdown, dentro de `docs/`, a medida que se actualizan: así quedan versionados junto al código. Los que todavía no se pasaron siguen como PDF en el proyecto.
 
 Los documentos 02, 03 y 07 son la fuente de verdad de las reglas de negocio. Si el código y la documentación no coinciden, se corrige uno de los dos en el mismo pull request.
 
