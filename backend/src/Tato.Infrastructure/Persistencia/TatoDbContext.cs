@@ -2,7 +2,9 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Tato.Application.Estudios;
+using Tato.Domain.Comun;
 using Tato.Domain.Estudios;
+using Tato.Domain.Portfolio;
 using Tato.Infrastructure.Estudios;
 
 namespace Tato.Infrastructure.Persistencia;
@@ -35,6 +37,16 @@ public sealed class TatoDbContext : IdentityUserContext<CuentaUsuario, Guid>
     public DbSet<Usuario> Usuarios => Set<Usuario>();
 
     public DbSet<Tatuador> Tatuadores => Set<Tatuador>();
+
+    public DbSet<Estilo> Estilos => Set<Estilo>();
+
+    public DbSet<ZonaCuerpo> ZonasCuerpo => Set<ZonaCuerpo>();
+
+    /// <summary>
+    /// Publicaciones del blog. Sus fotos se cargan con Include(p => p.Fotos): no tienen DbSet propio porque
+    /// solo se tocan a través de su publicación.
+    /// </summary>
+    public DbSet<Publicacion> Publicaciones => Set<Publicacion>();
 
     /// <summary>
     /// Estudio de la sesión. El filtro lo lee en cada consulta, del contexto que la ejecuta.

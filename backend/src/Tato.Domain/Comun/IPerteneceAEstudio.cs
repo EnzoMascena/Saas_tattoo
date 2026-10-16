@@ -1,4 +1,4 @@
-namespace Tato.Domain.Estudios;
+namespace Tato.Domain.Comun;
 
 /// <summary>
 /// Entidad que pertenece a un estudio (D-42). Todas las que la implementan quedan aisladas:

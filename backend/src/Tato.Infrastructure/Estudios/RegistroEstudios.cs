@@ -20,9 +20,17 @@ internal sealed class RegistroEstudios : IRegistroEstudios
         _userManager = userManager;
     }
 
-    public async Task AgregarEstudioAsync(Estudio estudio, CancellationToken cancellationToken)
+    public async Task AgregarEstudioAsync(
+        Estudio estudio,
+        IReadOnlyCollection<Estilo> estilos,
+        IReadOnlyCollection<ZonaCuerpo> zonasCuerpo,
+        CancellationToken cancellationToken)
     {
+        // Un solo SaveChanges, que EF hace en una transacción: no puede quedar un estudio sin sus catálogos.
         _contexto.Estudios.Add(estudio);
+        _contexto.Estilos.AddRange(estilos);
+        _contexto.ZonasCuerpo.AddRange(zonasCuerpo);
+
         await _contexto.SaveChangesAsync(cancellationToken);
     }
 

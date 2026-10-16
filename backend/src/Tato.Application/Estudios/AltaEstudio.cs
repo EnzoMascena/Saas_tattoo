@@ -16,7 +16,8 @@ public sealed class AltaEstudio
     }
 
     /// <summary>
-    /// Crea el estudio y devuelve su Id. Valida el dominio: si un dato no sirve, lanza ArgumentException.
+    /// Crea el estudio con sus catálogos iniciales de estilos y zonas del cuerpo, y devuelve su Id.
+    /// Valida el dominio: si un dato no sirve, lanza ArgumentException.
     /// Si la zona horaria viene vacía, se usa la de Argentina (D-43).
     /// </summary>
     public async Task<Guid> EjecutarAsync(
@@ -27,7 +28,11 @@ public sealed class AltaEstudio
     {
         var estudio = Estudio.Crear(nombre, plan, zonaHoraria);
 
-        await _registro.AgregarEstudioAsync(estudio, cancellationToken);
+        // Cada estudio arranca con los catálogos iniciales y después los adapta (R-11).
+        var estilos = CatalogosIniciales.CrearEstilos(estudio.Id);
+        var zonasCuerpo = CatalogosIniciales.CrearZonasCuerpo(estudio.Id);
+
+        await _registro.AgregarEstudioAsync(estudio, estilos, zonasCuerpo, cancellationToken);
 
         return estudio.Id;
     }

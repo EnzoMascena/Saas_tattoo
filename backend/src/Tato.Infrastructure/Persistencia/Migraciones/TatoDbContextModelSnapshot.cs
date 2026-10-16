@@ -86,12 +86,39 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Tato.Domain.Estudios.Estilo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("EstudioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstudioId", "Nombre")
+                        .IsUnique();
+
+                    b.ToTable("Estilos", (string)null);
+                });
+
             modelBuilder.Entity("Tato.Domain.Estudios.Estudio", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("DiasVencimientoSenia")
+                        .HasColumnType("int");
+
+                    b.Property<int>("MaxFotosPorPublicacion")
                         .HasColumnType("int");
 
                     b.Property<int>("MaxReagendamientos")
@@ -180,6 +207,125 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
                     b.HasIndex("EstudioId");
 
                     b.ToTable("Usuarios", (string)null);
+                });
+
+            modelBuilder.Entity("Tato.Domain.Estudios.ZonaCuerpo", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Activo")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("EstudioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Nombre")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstudioId", "Nombre")
+                        .IsUnique();
+
+                    b.ToTable("ZonasCuerpo", (string)null);
+                });
+
+            modelBuilder.Entity("Tato.Domain.Portfolio.Foto", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Alto")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Ancho")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("EstudioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Orden")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("PublicacionId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("SubidaEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PublicacionId");
+
+                    b.ToTable("Fotos", (string)null);
+                });
+
+            modelBuilder.Entity("Tato.Domain.Portfolio.Publicacion", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("ActualizadaEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<DateTimeOffset?>("ConsentimientoConfirmadoEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("ConsentimientoConfirmadoPor")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreadaEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("CreadaPor")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Descripcion")
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<bool>("Destacada")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("Estado")
+                        .HasColumnType("int");
+
+                    b.Property<Guid?>("EstiloId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("EstudioId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateOnly?>("FechaTrabajo")
+                        .HasColumnType("date");
+
+                    b.Property<DateTimeOffset?>("PublicadaEn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<byte[]>("RowVersion")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("rowversion");
+
+                    b.Property<Guid?>("TatuadorId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Titulo")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("nvarchar(120)");
+
+                    b.Property<Guid?>("ZonaCuerpoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EstudioId", "Estado");
+
+                    b.ToTable("Publicaciones", (string)null);
                 });
 
             modelBuilder.Entity("Tato.Infrastructure.Estudios.CuentaUsuario", b =>
@@ -298,6 +444,15 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Tato.Domain.Portfolio.Foto", b =>
+                {
+                    b.HasOne("Tato.Domain.Portfolio.Publicacion", null)
+                        .WithMany("Fotos")
+                        .HasForeignKey("PublicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("Tato.Infrastructure.Estudios.CuentaUsuario", b =>
                 {
                     b.HasOne("Tato.Domain.Estudios.Usuario", null)
@@ -305,6 +460,11 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
                         .HasForeignKey("Tato.Infrastructure.Estudios.CuentaUsuario", "Id")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Tato.Domain.Portfolio.Publicacion", b =>
+                {
+                    b.Navigation("Fotos");
                 });
 #pragma warning restore 612, 618
         }

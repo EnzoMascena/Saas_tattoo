@@ -8,7 +8,14 @@ namespace Tato.Application.Estudios;
 /// </summary>
 public interface IRegistroEstudios
 {
-    Task AgregarEstudioAsync(Estudio estudio, CancellationToken cancellationToken);
+    /// <summary>
+    /// Guarda el estudio junto con sus catálogos iniciales (R-11): todo o nada.
+    /// </summary>
+    Task AgregarEstudioAsync(
+        Estudio estudio,
+        IReadOnlyCollection<Estilo> estilos,
+        IReadOnlyCollection<ZonaCuerpo> zonasCuerpo,
+        CancellationToken cancellationToken);
 
     Task<bool> ExisteEstudioAsync(Guid estudioId, CancellationToken cancellationToken);
 

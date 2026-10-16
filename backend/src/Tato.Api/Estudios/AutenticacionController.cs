@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,19 @@ public sealed class AutenticacionController : ControllerBase
     public AutenticacionController(SignInManager<CuentaUsuario> signInManager)
     {
         _signInManager = signInManager;
+    }
+
+    /// <summary>
+    /// Entrega el token antiforgery que el panel manda en el encabezado X-XSRF-TOKEN de cada pedido que modifica
+    /// datos, y guarda su pareja en una cookie. El token queda atado al usuario: el panel lo pide al cargar y
+    /// otra vez después de iniciar o cerrar sesión.
+    /// </summary>
+    [HttpGet("antiforgery")]
+    [AllowAnonymous]
+    public TokenAntiforgeryRespuesta Antiforgery([FromServices] IAntiforgery antiforgery)
+    {
+        var tokens = antiforgery.GetAndStoreTokens(HttpContext);
+        return new TokenAntiforgeryRespuesta(tokens.RequestToken!, tokens.HeaderName!);
     }
 
     [HttpPost("login")]
@@ -70,3 +84,8 @@ public sealed record SolicitudLogin(string Email, string Password);
 /// Quién es el usuario de la sesión actual, para el panel.
 /// </summary>
 public sealed record UsuarioActualRespuesta(Guid Id, string Email, string Nombre, Guid EstudioId, string[] Roles);
+
+/// <summary>
+/// Token antiforgery y el encabezado en el que hay que mandarlo.
+/// </summary>
+public sealed record TokenAntiforgeryRespuesta(string Token, string Encabezado);

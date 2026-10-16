@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Tato.Domain.Comun;
 using Tato.Domain.Estudios;
 using Tato.Infrastructure.Persistencia;
 
