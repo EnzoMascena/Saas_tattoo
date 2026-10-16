@@ -5,6 +5,7 @@ namespace Tato.Application.Portfolio;
 /// <summary>
 /// Todo lo de una publicación, para la pantalla de edición del panel.
 /// </summary>
+/// <param name="Tipo">Trabajo o Blog (D-50).</param>
 /// <param name="Version">
 /// Versión de la fila (rowversion) en base64. Al guardar cambios, el panel la devuelve: si alguien modificó la
 /// publicación mientras tanto, la versión ya no coincide y el cambio se rechaza en lugar de pisar el otro.
@@ -12,6 +13,7 @@ namespace Tato.Application.Portfolio;
 public sealed record PublicacionDetalle(
     Guid Id,
     string Titulo,
+    TipoPublicacion Tipo,
     string? Descripcion,
     DateOnly? FechaTrabajo,
     Guid? EstiloId,

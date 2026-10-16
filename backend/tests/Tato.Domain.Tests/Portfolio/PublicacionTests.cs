@@ -116,15 +116,15 @@ public class PublicacionTests
     }
 
     [Fact]
-    public void Crear_ConDescripcionMayorA2000Caracteres_LanzaArgumentException()
+    public void Crear_ConDescripcionMayorA2200Caracteres_LanzaArgumentException()
     {
         // Arrange
-        var datos = new DatosPublicacion("Rosa", Descripcion: new string('a', 2001));
+        var datos = new DatosPublicacion("Rosa", Descripcion: new string('a', 2201));
 
         // Act & Assert
         var ex = Assert.Throws<ArgumentException>(() =>
             Publicacion.Crear(Guid.NewGuid(), Guid.NewGuid(), datos, Ahora));
-        Assert.Contains("no puede exceder 2000 caracteres", ex.Message);
+        Assert.Contains("no puede exceder 2200 caracteres", ex.Message);
     }
 
     [Fact]

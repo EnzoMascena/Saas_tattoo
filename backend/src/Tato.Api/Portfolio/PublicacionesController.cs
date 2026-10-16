@@ -13,16 +13,19 @@ namespace Tato.Api.Portfolio;
 public sealed class PublicacionesController : ControllerBase
 {
     /// <summary>
-    /// «Mis publicaciones»: de la modificada más recientemente a la más vieja, opcionalmente por estado.
+    /// «Mis publicaciones»: de la modificada más recientemente a la más vieja, opcionalmente por estado y por tipo.
     /// </summary>
     [HttpGet]
     public Task<Pagina<PublicacionResumen>> Listar(
         [FromServices] IConsultasPublicaciones consultas,
         [FromQuery] EstadoPublicacion? estado,
+        [FromQuery] TipoPublicacion? tipo,
         [FromQuery] int pagina = 1,
         [FromQuery] int tamanio = Paginacion.TamanioPorDefecto,
         CancellationToken cancellationToken = default) =>
-        consultas.ListarAsync(new FiltroPublicaciones(estado, new Paginacion(pagina, tamanio)), cancellationToken);
+        consultas.ListarAsync(
+            new FiltroPublicaciones(estado, new Paginacion(pagina, tamanio), tipo),
+            cancellationToken);
 
     /// <summary>
     /// Una publicación con sus fotos. 404 si no existe o es de otro estudio.
@@ -70,7 +73,8 @@ public sealed class PublicacionesController : ControllerBase
 }
 
 /// <summary>
-/// Datos de una publicación tal como los manda el panel. No trae estudio ni usuario: salen de la sesión.
+/// Datos de una publicación nueva tal como los manda el panel. No trae estudio ni usuario: salen de la sesión.
+/// Si no trae el tipo, es un trabajo.
 /// </summary>
 public sealed record SolicitudPublicacion(
     string Titulo,
@@ -79,14 +83,16 @@ public sealed record SolicitudPublicacion(
     Guid? EstiloId,
     Guid? ZonaCuerpoId,
     Guid? TatuadorId,
-    bool Destacada)
+    bool Destacada,
+    TipoPublicacion Tipo = TipoPublicacion.Trabajo)
 {
     internal DatosPublicacion ADatos() =>
-        new(Titulo, Descripcion, FechaTrabajo, EstiloId, ZonaCuerpoId, TatuadorId, Destacada);
+        new(Titulo, Descripcion, FechaTrabajo, EstiloId, ZonaCuerpoId, TatuadorId, Destacada, Tipo);
 }
 
 /// <summary>
-/// Los datos nuevos de la publicación, más la versión que tenía el panel al abrirla.
+/// Los datos nuevos de la publicación, más la versión que tenía el panel al abrirla. Reemplaza todos los datos,
+/// así que el tipo es obligatorio: si no viene, el dominio lo rechaza (400) en lugar de volverlo a Trabajo.
 /// </summary>
 public sealed record SolicitudEditarPublicacion(
     string Titulo,
@@ -96,10 +102,11 @@ public sealed record SolicitudEditarPublicacion(
     Guid? ZonaCuerpoId,
     Guid? TatuadorId,
     bool Destacada,
+    TipoPublicacion Tipo,
     string Version)
 {
     internal DatosPublicacion ADatos() =>
-        new(Titulo, Descripcion, FechaTrabajo, EstiloId, ZonaCuerpoId, TatuadorId, Destacada);
+        new(Titulo, Descripcion, FechaTrabajo, EstiloId, ZonaCuerpoId, TatuadorId, Destacada, Tipo);
 }
 
 public sealed record PublicacionCreadaRespuesta(Guid Id);
