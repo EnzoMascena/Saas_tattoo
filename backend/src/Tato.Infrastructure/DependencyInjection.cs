@@ -42,6 +42,8 @@ public static class DependencyInjection
         services.AddScoped<IConsultasPublicaciones, ConsultasPublicaciones>();
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<IRepositorioPublicaciones, RepositorioPublicaciones>();
+        services.AddScoped<IRepositorioPaginas, RepositorioPaginas>();
+        services.AddScoped<IConsultasPaginas, ConsultasPaginas>();
 
         AgregarArchivosYFotos(services, configuration);
 
