@@ -45,6 +45,9 @@ public sealed class CrearPublicacion
         // Primero el dominio: valida el formato sin ir a la base.
         var publicacion = Publicacion.Crear(estudioId, usuarioId, datos, _reloj.GetUtcNow());
 
+        // Solo en la página del estudio o en la propia (D-51).
+        PermisosPublicaciones.ExigirPublicarEnPagina(_usuarioActual, datos.TatuadorId);
+
         // Después, que lo elegido exista y se pueda usar.
         await ReferenciasPublicacion.VerificarAsync(datos, actual: null, _referencias, cancellationToken);
 

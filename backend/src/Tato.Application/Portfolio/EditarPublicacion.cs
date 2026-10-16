@@ -41,6 +41,10 @@ public sealed class EditarPublicacion
 
         PermisosPublicaciones.ExigirEditar(_usuarioActual, publicacion);
 
+        // Si la mueve de página, también tiene que poder publicar en la nueva (D-51).
+        if (datos.TatuadorId != publicacion.TatuadorId)
+            PermisosPublicaciones.ExigirPublicarEnPagina(_usuarioActual, datos.TatuadorId);
+
         // Antes de editar: compara los Ids nuevos con los que tiene ahora la publicación (R-11).
         await ReferenciasPublicacion.VerificarAsync(datos, publicacion, _referencias, cancellationToken);
 
