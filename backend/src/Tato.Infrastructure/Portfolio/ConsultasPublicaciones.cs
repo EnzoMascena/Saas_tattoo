@@ -28,6 +28,9 @@ internal sealed class ConsultasPublicaciones : IConsultasPublicaciones
         if (filtro.Estado is { } estado)
             consulta = consulta.Where(p => p.Estado == estado);
 
+        if (filtro.Tipo is { } tipo)
+            consulta = consulta.Where(p => p.Tipo == tipo);
+
         // Primero el total (para la paginación), después solo la página pedida.
         var total = await consulta.CountAsync(cancellationToken);
 
@@ -38,6 +41,7 @@ internal sealed class ConsultasPublicaciones : IConsultasPublicaciones
             .Select(p => new PublicacionResumen(
                 p.Id,
                 p.Titulo,
+                p.Tipo,
                 p.Estado,
                 p.Destacada,
                 p.FechaTrabajo,
@@ -62,6 +66,7 @@ internal sealed class ConsultasPublicaciones : IConsultasPublicaciones
             {
                 p.Id,
                 p.Titulo,
+                p.Tipo,
                 p.Descripcion,
                 p.FechaTrabajo,
                 p.EstiloId,
@@ -88,6 +93,7 @@ internal sealed class ConsultasPublicaciones : IConsultasPublicaciones
         return new PublicacionDetalle(
             fila.Id,
             fila.Titulo,
+            fila.Tipo,
             fila.Descripcion,
             fila.FechaTrabajo,
             fila.EstiloId,
