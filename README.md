@@ -5,7 +5,7 @@ Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 La primera entrega es el **blog y portfolio público**: una página parecida a un perfil de Instagram para cada estudio y para cada artista. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
-> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel de publicaciones con fotos. Sigue: ajustar el backend al alcance del doc 07 (versión 2.0), el wireframe y el front del panel.
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página». Sigue: los endpoints públicos, el wireframe y el front del panel.
 
 ---
 
@@ -122,7 +122,7 @@ Todo exige sesión, y todo es del estudio de la sesión. Los pedidos que modific
 
 | Método | Ruta | Qué hace |
 | --- | --- | --- |
-| `GET` | `/api/publicaciones?estado=&pagina=&tamanio=` | «Mis publicaciones», de la modificada más recientemente a la más vieja |
+| `GET` | `/api/publicaciones?estado=&tipo=&pagina=&tamanio=` | «Mis publicaciones», de la modificada más recientemente a la más vieja |
 | `GET` | `/api/publicaciones/{id}` | Detalle, con sus fotos en orden y su `version` |
 | `POST` | `/api/publicaciones` | Crea en Borrador (`201`) |
 | `PUT` | `/api/publicaciones/{id}` | Reemplaza los datos (manda el formulario completo y la `version`) |
@@ -137,16 +137,27 @@ Todo exige sesión, y todo es del estudio de la sesión. Los pedidos que modific
 
 Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para seguir editando sin recargar.
 
+### Mi página
+
+| Método | Ruta | Qué hace |
+| --- | --- | --- |
+| `GET` | `/api/paginas` | Las páginas que gestiona la persona: la suya de artista y, si es Dueño, la del estudio |
+| `GET` | `/api/paginas/{id}` | Detalle, con su `direccion` y su `version` |
+| `POST` | `/api/paginas` | Crea la del estudio (`delEstudio: true`) o la propia de artista (`201`). Nace oculta y la dirección sale del nombre |
+| `PUT` | `/api/paginas/{id}` | Reemplaza los datos. La dirección no cambia (RN-BLG-07) |
+| `PUT` | `/api/paginas/{id}/direccion` | Cambia la dirección a propósito. Única en toda la plataforma |
+| `POST` | `/api/paginas/{id}/mostrar` | La muestra en el sitio |
+| `POST` | `/api/paginas/{id}/ocultar` | La saca del sitio sin borrarla |
+
 ### Permisos
 
-Implementado hoy (P-21):
+Por página (D-51, doc 07). Cada artista gestiona su propia página, y nadie más la edita, ni siquiera un Dueño. En la página del estudio:
 
-| Rol | Crear | Editar | Publicar y ocultar |
-| --- | --- | --- | --- |
-| Dueño y Administrativo | Sí | Todas | Sí |
-| Tatuador | Sí | Solo las que creó | No |
-
-Por implementar (D-51, doc 07): permisos por página. Cada artista gestiona su propia página y nadie más la edita. En la página del estudio sigue valiendo la tabla de arriba.
+| Rol | Crear | Editar | Publicar y ocultar | Datos de la página |
+| --- | --- | --- | --- | --- |
+| Dueño | Sí | Todas | Sí | Sí |
+| Administrativo | Sí | Todas | Sí | No |
+| Tatuador | Sí | Solo las que creó | No | No |
 
 ### Errores
 
@@ -300,8 +311,9 @@ docs: cerrar P-18 con el hosting elegido
   - [ ] Primer despliegue
   - [x] Backend del panel, adelantado: publicaciones, permisos, control de versión y fotos (corte 2)
 - [ ] **Semana 3** (19 al 25/10): ajustes del backend al doc 07, versión 2.0, wireframe y front del panel
-  - [ ] Tipo de publicación, texto de 2200 caracteres y permisos por página
-  - [ ] Páginas públicas y endpoints públicos
+  - [x] Tipo de publicación, texto de 2200 caracteres y permisos por página
+  - [x] Páginas públicas en el panel («Mi página»)
+  - [ ] Endpoints públicos
   - [ ] Wireframe navegable del sitio y del panel
   - [ ] Front del panel
 - [ ] **Semana 4** (26/10 al 1/11): sitio público: las páginas, sus pestañas y el detalle de cada publicación
