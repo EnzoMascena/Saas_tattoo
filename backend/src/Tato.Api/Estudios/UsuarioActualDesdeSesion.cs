@@ -5,7 +5,7 @@ using Tato.Domain.Estudios;
 namespace Tato.Api.Estudios;
 
 /// <summary>
-/// Toma el Id y los roles del usuario de los claims que guarda la cookie al iniciar sesión.
+/// Toma el Id, los roles y el perfil de tatuador del usuario de los claims que guarda la cookie al iniciar sesión.
 /// </summary>
 internal sealed class UsuarioActualDesdeSesion : IUsuarioActual
 {
@@ -26,4 +26,9 @@ internal sealed class UsuarioActualDesdeSesion : IUsuarioActual
     public bool EsDuenio => Usuario?.IsInRole(nameof(Rol.Duenio)) ?? false;
 
     public bool EsAdministrativo => Usuario?.IsInRole(nameof(Rol.Administrativo)) ?? false;
+
+    public Guid? TatuadorId =>
+        Guid.TryParse(Usuario?.FindFirst(ClaimsTato.TatuadorId)?.Value, out var tatuadorId)
+            ? tatuadorId
+            : null;
 }
