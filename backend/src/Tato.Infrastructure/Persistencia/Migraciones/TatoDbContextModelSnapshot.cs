@@ -284,8 +284,8 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Descripcion")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasMaxLength(2200)
+                        .HasColumnType("nvarchar(2200)");
 
                     b.Property<bool>("Destacada")
                         .HasColumnType("bit");
@@ -312,6 +312,9 @@ namespace Tato.Infrastructure.Persistencia.Migraciones
 
                     b.Property<Guid?>("TatuadorId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Tipo")
+                        .HasColumnType("int");
 
                     b.Property<string>("Titulo")
                         .IsRequired()

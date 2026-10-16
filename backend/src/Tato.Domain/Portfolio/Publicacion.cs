@@ -15,7 +15,8 @@ namespace Tato.Domain.Portfolio;
 public sealed class Publicacion : IPerteneceAEstudio
 {
     public const int MaxTitulo = 120;
-    public const int MaxDescripcion = 2000;
+    // Hasta 2200 caracteres, el mismo límite que Instagram (RN-BLG-11).
+    public const int MaxDescripcion = 2200;
 
     private readonly List<Foto> _fotos = [];
 
@@ -41,6 +42,11 @@ public sealed class Publicacion : IPerteneceAEstudio
     public Guid EstudioId { get; }
 
     public string Titulo { get; private set; }
+
+    /// <summary>
+    /// En qué pestaña de la página pública aparece: Trabajos o Blog (D-50).
+    /// </summary>
+    public TipoPublicacion Tipo { get; private set; }
 
     /// <summary>
     /// Texto libre del trabajo. Opcional.
@@ -298,6 +304,9 @@ public sealed class Publicacion : IPerteneceAEstudio
         ValidarId(datos.ZonaCuerpoId, nameof(datos.ZonaCuerpoId));
         ValidarId(datos.TatuadorId, nameof(datos.TatuadorId));
 
+        if (!Enum.IsDefined(datos.Tipo))
+            throw new ArgumentException("El tipo de publicación no es válido.", nameof(datos.Tipo));
+
         Titulo = titulo;
         Descripcion = descripcion;
         FechaTrabajo = datos.FechaTrabajo;
@@ -305,6 +314,7 @@ public sealed class Publicacion : IPerteneceAEstudio
         ZonaCuerpoId = datos.ZonaCuerpoId;
         TatuadorId = datos.TatuadorId;
         Destacada = datos.Destacada;
+        Tipo = datos.Tipo;
     }
 
     /// <summary>

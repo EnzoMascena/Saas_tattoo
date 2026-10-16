@@ -42,6 +42,7 @@ internal sealed class PublicacionConfiguration : IEntityTypeConfiguration<Public
 
         builder.Property(p => p.Destacada).IsRequired();
         builder.Property(p => p.Estado).IsRequired();
+        builder.Property(p => p.Tipo).IsRequired();
 
         builder.Property(p => p.ConsentimientoConfirmadoPor);
         builder.Property(p => p.ConsentimientoConfirmadoEn);
