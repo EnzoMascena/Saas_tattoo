@@ -13,12 +13,20 @@ var esComando = ComandosEstudios.EsComando(args);
 if (esComando)
     builder.Logging.ClearProviders();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(opciones => opciones.AddDocumentTransformer<DocumentarAntiforgery>());
 
 // Todo POST, PUT, PATCH y DELETE de los controladores exige el token antiforgery (doc 06, 7.1).
 builder.Services.AddControllers(opciones => opciones.Filters.Add<ValidarAntiforgery>())
     // Los enums viajan como texto ("Borrador"), no como número: el front no depende del orden del enum.
     .AddJsonOptions(opciones => opciones.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+// Todo POST, PUT, PATCH y DELETE de los controladores exige el token antiforgery (doc 06, 7.1).
+builder.Services.AddControllers(opciones => opciones.Filters.Add<ValidarAntiforgery>())
+    // Los enums viajan como texto ("Borrador"), no como número: el front no depende del orden del enum.
+    .AddJsonOptions(opciones => opciones.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+
+// El documento de OpenAPI lee estas opciones y no las de AddJsonOptions: sin esto, los enums salen como números.
+builder.Services.ConfigureHttpJsonOptions(opciones =>
+    opciones.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
 // Errores con formato ProblemDetails (RFC 9457): las excepciones las traduce ManejadorErrores.
 builder.Services.AddProblemDetails();
@@ -47,6 +55,7 @@ if (app.Environment.IsDevelopment())
 {
     // Por la política por defecto todo pide sesión: el documento de OpenAPI se abre explícitamente.
     app.MapOpenApi().AllowAnonymous();
+    app.UseSwaggerUI(opciones => opciones.SwaggerEndpoint("/openapi/v1.json", "Tato API"));
 }
 
 app.UseHttpsRedirection();
