@@ -11,6 +11,8 @@
     <PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.12" />
     <PackageReference Include="NetVips" Version="3.2.0" />
     <PackageReference Include="NetVips.Native" Version="8.18.7" />
+    <!-- Versión corregida (avisos de seguridad del 13/10/2026): Microsoft.Data.SqlClient trae la 9.0.11, que es vulnerable. Sacarlo cuando SqlClient la actualice. -->
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.13" />
   </ItemGroup>
 
   <PropertyGroup>
