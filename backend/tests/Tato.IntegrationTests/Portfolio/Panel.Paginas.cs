@@ -69,5 +69,33 @@ internal sealed partial class Panel
             ?? throw new InvalidOperationException($"La página {id} no existe en el estudio {EstudioId}.");
     }
 
-    private AccionesPagina Acciones(TatoDbContext db) => new(new RepositorioPaginas(db), Usuario, Reloj);
+    /// <summary>
+    /// Sube la foto del encabezado o de «Sobre». Sin procesador, usa uno que la acepta siempre.
+    /// </summary>
+    public async Task<FotoPaginaSubida> SubirFotoPaginaAsync(
+        Guid id,
+        LugarFotoPagina lugar,
+        string version,
+        IProcesadorFotos? procesador = null)
+    {
+        await using var db = Contexto();
+        var subir = new SubirFotoPagina(
+            new RepositorioPaginas(db), procesador ?? new ProcesadorFalso(), Almacenamiento, Usuario, Reloj);
+        return await subir.EjecutarAsync(id, lugar, Stream.Null, version);
+    }
+
+    public async Task<string> QuitarFotoPaginaAsync(Guid id, LugarFotoPagina lugar, string version)
+    {
+        await using var db = Contexto();
+        return await Acciones(db).QuitarFotoAsync(id, lugar, version);
+    }
+
+    /// <summary>
+    /// Abre una foto como el panel, con el estudio de esta sesión. Null si no la encuentra.
+    /// </summary>
+    public Task<Stream?> LeerFotoAsync(Guid fotoId, TamanioFoto tamanio) =>
+        new LeerFoto(_estudio, Almacenamiento).EjecutarAsync(fotoId, tamanio);
+
+    private AccionesPagina Acciones(TatoDbContext db) =>
+        new(new RepositorioPaginas(db), Almacenamiento, Usuario, Reloj);
 }
