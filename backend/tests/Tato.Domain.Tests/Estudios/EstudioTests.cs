@@ -68,7 +68,7 @@ public class EstudioTests
     public void Crear_ConDiasVencimientoMenorOIgualACero_LanzaArgumentException()
     {
         // Act & Assert
-        var ex = Assert.Throws<ArgumentException>(() => 
+        var ex = Assert.Throws<ArgumentException>(() =>
             Estudio.Crear("Test", "starter", diasVencimientoSenia: 0));
         Assert.Contains("deben ser mayor a 0", ex.Message);
     }
@@ -77,7 +77,7 @@ public class EstudioTests
     public void Crear_ConMaxReagendamientosNegativo_LanzaArgumentException()
     {
         // Act & Assert
-        var ex = Assert.Throws<ArgumentException>(() => 
+        var ex = Assert.Throws<ArgumentException>(() =>
             Estudio.Crear("Test", "starter", maxReagendamientos: -1));
         Assert.Contains("no puede ser negativo", ex.Message);
     }
@@ -103,7 +103,7 @@ public class EstudioTests
         var estudio = Estudio.Crear("Test", "starter");
 
         // Act & Assert
-        var ex = Assert.Throws<ArgumentException>(() => 
+        var ex = Assert.Throws<ArgumentException>(() =>
             estudio.ConfigurarParametros(diasVencimientoSenia: 0, maxReagendamientos: 2));
         Assert.Contains("deben ser mayor a 0", ex.Message);
     }
@@ -115,7 +115,7 @@ public class EstudioTests
         var estudio = Estudio.Crear("Test", "starter");
 
         // Act & Assert
-        var ex = Assert.Throws<ArgumentException>(() => 
+        var ex = Assert.Throws<ArgumentException>(() =>
             estudio.ConfigurarParametros(diasVencimientoSenia: 14, maxReagendamientos: -1));
         Assert.Contains("no puede ser negativo", ex.Message);
     }

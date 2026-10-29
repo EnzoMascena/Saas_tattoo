@@ -12,3 +12,7 @@ insert_final_newline = true
 indent_size = 4
 csharp_indent_case_contents = true
 csharp_indent_switch_labels = true
+
+# Las migraciones las genera dotnet ef (con BOM): no se formatean a mano.
+[src/Tato.Infrastructure/Persistencia/Migraciones/*.cs]
+generated_code = true
