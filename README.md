@@ -5,7 +5,7 @@ Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 La primera entrega es el **blog y portfolio público**: una página parecida a un perfil de Instagram para cada estudio y para cada artista. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
-> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página». Sigue: los endpoints públicos, el wireframe y el front del panel.
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página». Sigue, hasta el 2/11: terminar el backend con las fotos de cada página, los endpoints públicos, la preparación para producción y las vistas previas. Después, el panel y el sitio.
 
 ---
 
@@ -309,25 +309,17 @@ docs: cerrar P-18 con el hosting elegido
 
 ## Hoja de ruta de la versión 1
 
-- [ ] **Semana 1** (5 al 11/10): repositorio, entorno, hosting y dominio (corte 0)
-  - [x] Repositorio y entorno
-  - [ ] Hosting y dominio (P-18)
-- [ ] **Semana 2** (12 al 18/10): login, estudios, usuarios y aislamiento por estudio (corte 1) · primer despliegue
-  - [x] Login, estudios, usuarios y aislamiento por estudio
-  - [ ] Primer despliegue
-  - [x] Backend del panel, adelantado: publicaciones, permisos, control de versión y fotos (corte 2)
-- [ ] **Semana 3** (19 al 25/10): ajustes del backend al doc 07, versión 2.0, wireframe y front del panel
-  - [x] Tipo de publicación, texto de 2200 caracteres y permisos por página
-  - [x] Páginas públicas en el panel («Mi página»)
+- [x] **5 al 25/10**: repositorio y entorno (corte 0); login, estudios, usuarios y aislamiento por estudio (corte 1); backend del panel (corte 2); tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página»
+- [ ] **26/10 al 2/11**: terminar el backend
+  - [ ] Fotos de cada página (R-16)
   - [ ] Endpoints públicos
-  - [ ] Wireframe navegable del sitio y del panel
-  - [ ] Front del panel
-- [ ] **Semana 4** (26/10 al 1/11): sitio público: las páginas, sus pestañas y el detalle de cada publicación
-- [ ] **Semana 5** (2 al 8/11): diseño visual de cada página, vistas previas y SEO
-- [ ] **Semana 6** (9 al 15/11): carga del contenido real, pruebas en celulares y ajustes, sin funciones nuevas
-- [ ] **16/11**: margen
+  - [ ] Listo para producción: configuración, Docker, backups y guía de despliegue
+  - [ ] Vistas previas y SEO
+- [ ] **3 al 9/11**: el panel, con su wireframe, y el primer despliegue (P-18)
+- [ ] **10 al 16/11**: el sitio público y las pruebas en celulares
+- [ ] **17/11**: online
 
-Si el plan se atrasa, se recorta en este orden: el diseño visual propio de cada página (se arranca con un tema común), la pestaña Blog y la pestaña «Sobre». Lo indispensable es el encabezado con contacto, la pestaña Trabajos, el detalle y el panel de carga.
+El primer recorte ya está aplicado: las tres páginas arrancan con un tema visual común, y el diseño propio de cada una (D-49) queda para después. Si el plan se sigue atrasando, se recortan la pestaña Blog y después la pestaña «Sobre». Lo indispensable es el encabezado con contacto, la pestaña Trabajos, el detalle y el panel de carga.
 
 ---
 

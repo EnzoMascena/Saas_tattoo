@@ -4,7 +4,7 @@ Requerimientos de la primera entrega: las páginas públicas del estudio y de su
 
 | Versión | Fecha | Estado | Relacionados |
 | --- | --- | --- | --- |
-| 2.1 | 16 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
+| 2.2 | 29 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
 
 > **Prioridad (D-46):** el blog es la primera entrega y tiene que estar online antes del **17 de noviembre de 2026**, cuando la tatuadora del estudio piloto viaja a tatuar a Bolivia. El MVP de gestión sigue después.
 
@@ -182,21 +182,21 @@ La misma que el MVP (D-47).
 
 ## 11. Plan hasta el 17 de noviembre
 
-| Semana | Fechas | Objetivo | Estado al 16/10 |
-| --- | --- | --- | --- |
-| 1 | 5 al 11 de octubre | Repositorio y entorno (corte 0). Hosting y dominio (P-18). | Repositorio listo. Hosting y dominio pendientes. |
-| 2 | 12 al 18 de octubre | Login, estudios, usuarios y aislamiento (corte 1). Primer despliegue. | Corte 1 listo, y también el backend del panel (corte 2), adelantado. Despliegue pendiente. |
-| 3 | 19 al 25 de octubre | Ajustar el backend a esta versión: tipo de publicación, texto de 2200 caracteres, permisos por página, páginas públicas y endpoints públicos. Wireframe navegable. Front del panel. | Adelantado: tipo, 2200 caracteres, permisos por página y páginas públicas en el panel. Siguen los endpoints públicos. |
-| 4 | 26 de octubre al 1 de noviembre | Sitio público: las páginas, sus pestañas y el detalle de cada publicación. | — |
-| 5 | 2 al 8 de noviembre | Diseño visual de cada página, vistas previas y SEO. | — |
-| 6 | 9 al 15 de noviembre | Carga del contenido real, pruebas en celulares y ajustes. No se suman funciones nuevas. | — |
-| — | 16 de noviembre | Margen. | — |
+Plan actualizado el 29/10: el backend se termina primero y el front va después, de una vez.
+
+| Fechas | Objetivo | Estado al 29/10 |
+| --- | --- | --- |
+| 5 al 25 de octubre | Repositorio y entorno (corte 0). Login, estudios, usuarios y aislamiento (corte 1). Backend del panel (corte 2). Ajustes a esta versión: tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página». | Listo. |
+| 26 de octubre al 2 de noviembre | Terminar el backend: fotos de cada página (R-16), endpoints públicos, preparación para producción, y vistas previas y SEO. | En curso. |
+| 3 al 9 de noviembre | El panel, con su wireframe, y el primer despliegue (P-18). | — |
+| 10 al 16 de noviembre | El sitio público y las pruebas en celulares. | — |
+| 17 de noviembre | Online. | — |
 
 ### Riesgos y recortes
 
 - **El cuello de botella suele ser el contenido:** las fotos elegidas con permiso de los clientes y los textos. Conviene que el estudio piloto empiece a juntarlo ya.
 - **Orden de recorte propuesto**, si el plan se atrasa:
-  1. El diseño visual propio de cada página: se arranca con un tema común.
+  1. El diseño visual propio de cada página: se arranca con un tema común. **Aplicado:** las tres páginas arrancan con un tema común, y el diseño propio de cada una (D-49) queda para después.
   2. La pestaña Blog.
   3. La pestaña «Sobre».
 
@@ -256,6 +256,7 @@ Salen del Instagram de cada uno. Se usan en la etapa de diseño, después de apr
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
+| 2.2 | 29/10/2026 | Plan nuevo hasta el 17/11 (sección 11): el backend se termina hasta el 2/11; el panel y el primer despliegue van del 3 al 9/11, y el sitio, del 10 al 16/11. Se aplica el primer recorte: tema visual común para las tres páginas. |
 | 2.1 | 16/10/2026 | Estado de las reglas: RN-BLG-07 y RN-BLG-11 implementadas; RN-BLG-12, en parte. La Página pública, implementada en el backend sin sus fotos. |
 | 2.0 | 16/10/2026 | Se cierran las preguntas de la 1.0 y el alcance se achica a un portfolio parecido a Instagram, con páginas por estudio y por artista. Decisiones D-48 a D-56. Reglas RN-BLG-11 a RN-BLG-13; RN-BLG-07 ampliada, RN-BLG-08 postergada y RN-BLG-09 reemplazada. Pasa a Markdown, en `docs/` del repositorio. |
 | 1.0 | 4/10/2026 | Borrador inicial para discutir. |
