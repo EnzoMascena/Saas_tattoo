@@ -66,14 +66,11 @@ internal sealed class ConsultasPaginas : IConsultasPaginas
                 f.Sobre,
                 f.Ubicacion,
                 f.Horarios,
-                ConMedidas(f.Foto),
-                ConMedidas(f.FotoSobre),
+                FotoConMedidas.De(f.Foto),
+                FotoConMedidas.De(f.FotoSobre),
                 f.Visible,
                 f.ActualizadaEn,
                 Convert.ToBase64String(f.Version))),
         ];
     }
-
-    private static FotoConMedidas? ConMedidas(FotoPagina? foto) =>
-        foto is null ? null : new FotoConMedidas(foto.Id, foto.Ancho, foto.Alto);
 }

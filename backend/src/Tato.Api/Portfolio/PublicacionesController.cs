@@ -31,6 +31,8 @@ public sealed class PublicacionesController : ControllerBase
     /// Una publicación con sus fotos. 404 si no existe o es de otro estudio.
     /// </summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<ActionResult<PublicacionDetalle>> Obtener(
         Guid id,
         [FromServices] IConsultasPublicaciones consultas,
@@ -45,6 +47,7 @@ public sealed class PublicacionesController : ControllerBase
     /// Crea una publicación en Borrador y devuelve su Id.
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<PublicacionCreadaRespuesta>> Crear(
         SolicitudPublicacion solicitud,
         [FromServices] CrearPublicacion crearPublicacion,

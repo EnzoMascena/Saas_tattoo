@@ -25,6 +25,8 @@ public sealed class PaginasController : ControllerBase
     /// Una página del estudio. 404 si no existe o es de otro estudio.
     /// </summary>
     [HttpGet("{id:guid}")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<ActionResult<PaginaDetalle>> Obtener(
         Guid id,
         [FromServices] IConsultasPaginas consultas,
@@ -39,6 +41,7 @@ public sealed class PaginasController : ControllerBase
     /// Crea la página del estudio (delEstudio: true) o la propia de artista. Nace oculta.
     /// </summary>
     [HttpPost]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<PaginaCreadaRespuesta>> Crear(
         SolicitudPagina solicitud,
         [FromServices] CrearPagina crearPagina,
@@ -95,6 +98,7 @@ public sealed class PaginasController : ControllerBase
     /// <param name="archivo">La foto, tal como la saca el celular.</param>
     /// <param name="version">La versión que tenía el panel.</param>
     [HttpPost("{id:guid}/fotos/{lugar}")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<FotoPaginaSubida>> SubirFoto(
         Guid id,
         LugarFotoPagina lugar,

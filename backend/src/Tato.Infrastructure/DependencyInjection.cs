@@ -44,6 +44,7 @@ public static class DependencyInjection
         services.AddScoped<IRepositorioPublicaciones, RepositorioPublicaciones>();
         services.AddScoped<IRepositorioPaginas, RepositorioPaginas>();
         services.AddScoped<IConsultasPaginas, ConsultasPaginas>();
+        services.AddScoped<IConsultasDelSitio, ConsultasDelSitio>();
 
         AgregarArchivosYFotos(services, configuration);
 

@@ -20,6 +20,7 @@ public sealed class FotosController : ControllerBase
     /// <param name="archivo">La foto, tal como la saca el celular.</param>
     /// <param name="version">La versión que tenía el panel.</param>
     [HttpPost("api/publicaciones/{id:guid}/fotos")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
     public async Task<ActionResult<FotoSubida>> Subir(
         Guid id,
         IFormFile archivo,
@@ -38,6 +39,8 @@ public sealed class FotosController : ControllerBase
     /// Devuelve una versión de la foto: miniatura, galeria o detalle.
     /// </summary>
     [HttpGet("api/fotos/{fotoId:guid}/{tamanio}")]
+    [ProducesResponseType(typeof(Stream), StatusCodes.Status200OK, TipoWebp)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<IActionResult> Leer(
         Guid fotoId,
         TamanioFoto tamanio,

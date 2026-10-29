@@ -27,6 +27,11 @@ public sealed class BaseDeDatosFixture : IAsyncLifetime
     private MsSqlContainer? _contenedor;
     private string _cadenaConexion = string.Empty;
 
+    /// <summary>
+    /// La de la base de esta corrida, para levantar la API contra ella (ver ApiFixture).
+    /// </summary>
+    internal string CadenaConexion => _cadenaConexion;
+
     public async Task InitializeAsync()
     {
         var servidor = Environment.GetEnvironmentVariable(VariableServidor);
