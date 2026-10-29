@@ -5,7 +5,7 @@ Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 La primera entrega es el **blog y portfolio público**: una página parecida a un perfil de Instagram para cada estudio y para cada artista. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
-> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página». Sigue, hasta el 2/11: terminar el backend con las fotos de cada página, los endpoints públicos, la preparación para producción y las vistas previas. Después, el panel y el sitio.
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página», con la foto o logo y la foto de «Sobre». Sigue, hasta el 2/11: terminar el backend con los endpoints públicos, la preparación para producción y las vistas previas. Después, el panel y el sitio.
 
 ---
 
@@ -313,7 +313,7 @@ docs: cerrar P-18 con el hosting elegido
 
 - [x] **5 al 25/10**: repositorio y entorno (corte 0); login, estudios, usuarios y aislamiento por estudio (corte 1); backend del panel (corte 2); tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página»
 - [ ] **26/10 al 2/11**: terminar el backend
-  - [ ] Fotos de cada página (R-16)
+  - [x] Fotos de cada página (R-16)
   - [ ] Endpoints públicos
   - [ ] Listo para producción: configuración, Docker, backups y guía de despliegue
   - [ ] Vistas previas y SEO
