@@ -28,7 +28,12 @@ builder.Services.AddControllers(opciones =>
 
 // El documento de OpenAPI lee estas opciones y no las de AddJsonOptions: sin esto, los enums salen como números.
 builder.Services.ConfigureHttpJsonOptions(opciones =>
-    opciones.SerializerOptions.Converters.Add(new JsonStringEnumConverter()));
+{
+    opciones.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+
+    // Sin esto, los números salen como «integer o string» y el cliente que genera Orval los tipa como number | string.
+    opciones.SerializerOptions.NumberHandling = JsonNumberHandling.Strict;
+});
 
 // Errores con formato ProblemDetails (RFC 9457): las excepciones las traduce ManejadorErrores.
 builder.Services.AddProblemDetails();

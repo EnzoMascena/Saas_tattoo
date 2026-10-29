@@ -38,6 +38,8 @@ public sealed class AutenticacionController : ControllerBase
     }
 
     [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [AllowAnonymous]
     [EnableRateLimiting(AutenticacionExtensions.PoliticaLogin)]
     public async Task<IActionResult> Login(SolicitudLogin solicitud)
@@ -51,6 +53,7 @@ public sealed class AutenticacionController : ControllerBase
     }
 
     [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();

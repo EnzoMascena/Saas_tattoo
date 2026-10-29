@@ -45,7 +45,8 @@ public sealed class SitioController : ControllerBase
     /// </summary>
     [HttpGet("paginas/{direccion}")]
     [OutputCache(PolicyName = PoliticaCache)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<ActionResult<PaginaDelSitio>> ObtenerPagina(
         string direccion,
         [FromServices] IConsultasDelSitio consultas,
@@ -65,7 +66,8 @@ public sealed class SitioController : ControllerBase
     /// </summary>
     [HttpGet("paginas/{direccion}/publicaciones")]
     [OutputCache(PolicyName = PoliticaCache)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<ActionResult<Pagina<PublicacionDelSitio>>> ListarPublicaciones(
         string direccion,
         [FromServices] IConsultasDelSitio consultas,
@@ -88,7 +90,8 @@ public sealed class SitioController : ControllerBase
     /// </summary>
     [HttpGet("paginas/{direccion}/publicaciones/{id:guid}")]
     [OutputCache(PolicyName = PoliticaCache)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<ActionResult<PublicacionDelSitioDetalle>> ObtenerPublicacion(
         string direccion,
         Guid id,
@@ -108,8 +111,8 @@ public sealed class SitioController : ControllerBase
     /// extensión. No pasa por la caché de salida: los archivos ya los guardan Cloudflare y el navegador.
     /// </summary>
     [HttpGet("fotos/{fotoId:guid}/{tamanio}.webp")]
-    [ProducesResponseType(typeof(FileStreamResult), StatusCodes.Status200OK, TipoWebp)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(Stream), StatusCodes.Status200OK, TipoWebp)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public async Task<IActionResult> LeerFoto(
         Guid fotoId,
         TamanioFoto tamanio,
