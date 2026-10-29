@@ -4,8 +4,9 @@ using Tato.Domain.Estudios;
 namespace Tato.Domain.Portfolio;
 
 /// <summary>
-/// Un trabajo publicado en el blog del estudio (doc 07, sección 5). Es la raíz del agregado: sus fotos se
-/// agregan, se quitan y se ordenan solo a través de ella, así las reglas no se pueden saltear.
+/// Una publicación de una página pública: un Trabajo o un Blog (D-50, doc 07, sección 6). Es la raíz del
+/// agregado: sus fotos se agregan, se quitan y se ordenan solo a través de ella, así las reglas no se pueden
+/// saltear.
 /// <para>
 /// Nunca guarda datos del cliente (RN-BLG-02). Todos los métodos que cambian algo reciben «ahora» en UTC
 /// (D-43) y actualizan <see cref="ActualizadaEn"/>: así cualquier cambio, también en las fotos, modifica la
@@ -49,7 +50,7 @@ public sealed class Publicacion : IPerteneceAEstudio
     public TipoPublicacion Tipo { get; private set; }
 
     /// <summary>
-    /// Texto libre del trabajo. Opcional.
+    /// Texto libre de la publicación. Opcional.
     /// </summary>
     public string? Descripcion { get; private set; }
 
@@ -69,12 +70,12 @@ public sealed class Publicacion : IPerteneceAEstudio
     public Guid? ZonaCuerpoId { get; private set; }
 
     /// <summary>
-    /// Perfil del tatuador que hizo el trabajo. Opcional.
+    /// Artista de cuya página es la publicación. Sin artista, es de la página del estudio (RN-BLG-12).
     /// </summary>
     public Guid? TatuadorId { get; private set; }
 
     /// <summary>
-    /// Si aparece entre los destacados del inicio del sitio.
+    /// Si está fijada: aparece primero en su página (RN-BLG-13).
     /// </summary>
     public bool Destacada { get; private set; }
 
