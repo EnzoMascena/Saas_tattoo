@@ -133,7 +133,7 @@ Todo exige sesión, y todo es del estudio de la sesión. Los pedidos que modific
 | `POST` | `/api/publicaciones/{id}/fotos/{fotoId}/quitar` | Quita la foto y borra sus archivos |
 | `PUT` | `/api/publicaciones/{id}/fotos/orden` | Reordena: la primera queda como portada |
 | `POST` | `/api/publicaciones/{id}/fotos/{fotoId}/portada` | Pone esa foto primera |
-| `GET` | `/api/fotos/{fotoId}/{tamanio}` | Devuelve la versión `miniatura`, `galeria` o `detalle` en WebP |
+| `GET` | `/api/fotos/{fotoId}/{tamanio}` | Devuelve la versión `miniatura`, `galeria` o `detalle` en WebP, de una publicación o de una página |
 
 Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para seguir editando sin recargar.
 
@@ -142,12 +142,14 @@ Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para se
 | Método | Ruta | Qué hace |
 | --- | --- | --- |
 | `GET` | `/api/paginas` | Las páginas que gestiona la persona: la suya de artista y, si es Dueño, la del estudio |
-| `GET` | `/api/paginas/{id}` | Detalle, con su `direccion` y su `version` |
+| `GET` | `/api/paginas/{id}` | Detalle, con su `direccion`, sus fotos (`foto` y `fotoSobre`, con Id, ancho y alto) y su `version` |
 | `POST` | `/api/paginas` | Crea la del estudio (`delEstudio: true`) o la propia de artista (`201`). Nace oculta y la dirección sale del nombre |
 | `PUT` | `/api/paginas/{id}` | Reemplaza los datos. La dirección no cambia (RN-BLG-07) |
 | `PUT` | `/api/paginas/{id}/direccion` | Cambia la dirección a propósito. Única en toda la plataforma |
 | `POST` | `/api/paginas/{id}/mostrar` | La muestra en el sitio |
 | `POST` | `/api/paginas/{id}/ocultar` | La saca del sitio sin borrarla |
+| `POST` | `/api/paginas/{id}/fotos/{lugar}` | Sube la foto o logo del encabezado (`encabezado`) o la foto de «Sobre» (`sobre`): `multipart/form-data` con `archivo` y `version` (`201`). Si ya tenía una, la reemplaza (R-16) |
+| `POST` | `/api/paginas/{id}/fotos/{lugar}/quitar` | Quita esa foto y borra sus archivos. Si no tenía, no cambia nada |
 
 ### Permisos
 
