@@ -289,7 +289,7 @@ Nada hardcodeado (D-34):
 
 ## Convenciones
 
-**Idioma.** El dominio usa el vocabulario del glosario (doc 05): `Publicacion`, `Diseno`, `Estudio`, `Turno`, `Sena`. Sin ñ ni tildes en los identificadores.
+**Idioma.** El dominio usa el vocabulario del glosario (doc 05): `Publicacion`, `Disenio`, `Estudio`, `Turno`, `Senia`. Los identificadores van sin tildes, y la ñ se escribe «ni»: `Duenio`, `Tamanio`.
 
 **Ramas.** `main` siempre está desplegable y protegida. El trabajo va en ramas cortas (`feat/…`, `fix/…`, `docs/…`) y entra por pull request, para que corra la CI.
 
