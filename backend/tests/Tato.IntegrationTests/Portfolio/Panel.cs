@@ -41,7 +41,12 @@ internal sealed partial class Panel
     /// <summary>
     /// Da de alta un estudio nuevo en la base y devuelve un panel de ese estudio para el usuario.
     /// </summary>
-    public static async Task<Panel> CrearAsync(BaseDeDatosFixture baseDeDatos, UsuarioFalso usuario, int maxFotos = 10)
+    /// <param name="almacenamiento">El de la API en memoria, para que lea las fotos que sube el panel.</param>
+    public static async Task<Panel> CrearAsync(
+        BaseDeDatosFixture baseDeDatos,
+        UsuarioFalso usuario,
+        int maxFotos = 10,
+        AlmacenamientoEnMemoria? almacenamiento = null)
     {
         var estudio = Estudio.Crear($"Estudio {Guid.NewGuid():N}", "starter", maxFotosPorPublicacion: maxFotos);
 
@@ -52,7 +57,8 @@ internal sealed partial class Panel
             await contexto.SaveChangesAsync();
         }
 
-        return new Panel(baseDeDatos, new EstudioFalso(estudio.Id), usuario, new AlmacenamientoEnMemoria());
+        return new Panel(
+            baseDeDatos, new EstudioFalso(estudio.Id), usuario, almacenamiento ?? new AlmacenamientoEnMemoria());
     }
 
     /// <summary>

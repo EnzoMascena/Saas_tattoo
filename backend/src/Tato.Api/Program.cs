@@ -31,7 +31,7 @@ builder.Services.AddExceptionHandler<ManejadorErrores>();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddAutenticacion();
 builder.Services.AddEstudios();
-builder.Services.AddPortfolio();
+builder.Services.AddPortfolio(builder.Configuration);
 
 var app = builder.Build();
 

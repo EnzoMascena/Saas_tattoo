@@ -28,4 +28,10 @@ public interface IConsultasDelSitio
         DireccionPublica direccion,
         Guid id,
         CancellationToken cancellationToken);
+
+    /// <summary>
+    /// Dónde está una foto que se puede mostrar: de una publicación Publicada de una página visible, o la foto o logo
+    /// o la de «Sobre» de una página visible. Null en cualquier otro caso.
+    /// </summary>
+    Task<UbicacionFoto?> UbicarFotoAsync(Guid fotoId, CancellationToken cancellationToken);
 }

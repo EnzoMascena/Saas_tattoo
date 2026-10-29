@@ -167,6 +167,31 @@ internal sealed class ConsultasDelSitio : IConsultasDelSitio
                 fila.Id, fila.Tipo, fila.Titulo, fila.Descripcion, fila.PublicadaEn!.Value, fila.Fotos);
     }
 
+    public async Task<UbicacionFoto?> UbicarFotoAsync(Guid fotoId, CancellationToken cancellationToken)
+    {
+        // De una publicación Publicada cuya página se ve: la de su artista o, sin artista, la del estudio
+        // (RN-BLG-12). Las dos comparaciones de TatuadorId aceptan null: EF las traduce con IS NULL.
+        var paginasVisibles = PaginasVisibles;
+        var deUnaPublicacion = await _db.Publicaciones
+            .IgnoreQueryFilters([TatoDbContext.FiltroEstudio])
+            .Where(p => p.Estado == EstadoPublicacion.Publicada && p.Fotos.Any(f => f.Id == fotoId))
+            .Where(p => paginasVisibles.Any(pagina =>
+                pagina.EstudioId == p.EstudioId && pagina.TatuadorId == p.TatuadorId))
+            .Select(p => (Guid?)p.EstudioId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (deUnaPublicacion is { } estudioDeLaPublicacion)
+            return new UbicacionFoto(estudioDeLaPublicacion, EsDePagina: false);
+
+        // O la foto o logo, o la de «Sobre», de una página visible (R-16).
+        var deUnaPagina = await PaginasVisibles
+            .Where(p => p.Foto!.Id == fotoId || p.FotoSobre!.Id == fotoId)
+            .Select(p => (Guid?)p.EstudioId)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        return deUnaPagina is { } estudioDeLaPagina ? new UbicacionFoto(estudioDeLaPagina, EsDePagina: true) : null;
+    }
+
     /// <summary>
     /// El comienzo del texto, cortado en el último espacio antes del largo pedido y con «…» si sigue.
     /// </summary>
