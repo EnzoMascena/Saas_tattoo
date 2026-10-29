@@ -243,8 +243,14 @@ dotnet run --project src/Tato.Api -- alta-usuario
 # Levantar la API con HTTPS: las cookies de sesión (__Host-) solo viajan por HTTPS
 dotnet run --project src/Tato.Api --launch-profile https
 ```
+La API queda en `https://localhost:7239`. En desarrollo, el documento OpenAPI está en `/openapi/v1.json` y las fotos se guardan en `src/Tato.Api/archivos/`.
 
-La API queda en `https://localhost:7239`. En desarrollo, el documento OpenAPI está en `/openapi/v1.json`, y las fotos se guardan en `src/Tato.Api/archivos/`.
+Para probarla desde el navegador, Swagger UI está en `https://localhost:7239/swagger`, solo en desarrollo. Los pedidos que modifican datos llevan el token antiforgery:
+
+1. `GET /api/auth/antiforgery` y copiar el `token`.
+2. Pegarlo en **Authorize**.
+3. `POST /api/auth/login`, que responde `204`.
+4. Pedir un token nuevo y cambiarlo en **Authorize** (Logout y pegar el nuevo): el de antes de iniciar sesión ya no sirve.
 
 ### Frontend
 
