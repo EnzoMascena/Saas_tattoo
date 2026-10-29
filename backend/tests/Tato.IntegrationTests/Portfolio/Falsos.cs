@@ -79,3 +79,12 @@ internal sealed class ProcesadorFalso : IProcesadorFotos
                 .Select(tamanio => new VersionFoto(tamanio, [1, 2, 3], Ancho, Alto))
                 .ToList()));
 }
+
+/// <summary>
+/// Rechaza toda foto, como NetVips con un archivo que no es una imagen.
+/// </summary>
+internal sealed class ProcesadorQueRechaza : IProcesadorFotos
+{
+    public Task<FotoProcesada> ProcesarAsync(Stream original, CancellationToken cancellationToken) =>
+        throw new FotoInvalidaException("El archivo no es una imagen.");
+}

@@ -44,8 +44,7 @@ public sealed class AccionesFotos
         var versionNueva = await _repositorio.GuardarCambiosAsync(publicacion, version, cancellationToken);
 
         // Después los archivos. Si esto falla, quedan archivos que nadie muestra, pero nada se rompe.
-        foreach (var clave in ClavesFotos.Todas(publicacion.EstudioId, fotoId))
-            await _almacenamiento.BorrarAsync(clave, CancellationToken.None);
+        await ArchivosDeFotos.BorrarAsync(_almacenamiento, ClavesFotos.Todas(publicacion.EstudioId, fotoId));
 
         return versionNueva;
     }

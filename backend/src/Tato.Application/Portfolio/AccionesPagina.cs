@@ -6,19 +6,25 @@ using Tato.Domain.Portfolio;
 namespace Tato.Application.Portfolio;
 
 /// <summary>
-/// Casos de uso que cambian una página: sus datos, su dirección y si se ve en el sitio. Todos cargan la página,
-/// verifican que la persona la gestione (<see cref="PermisosPaginas"/>), la cambian y la guardan con la versión que
-/// tenía el panel. Cada uno devuelve la versión nueva.
+/// Casos de uso que cambian una página: sus datos, su dirección, si se ve en el sitio y quitar sus fotos. Todos
+/// cargan la página, verifican que la persona la gestione (<see cref="PermisosPaginas"/>), la cambian y la guardan
+/// con la versión que tenía el panel. Cada uno devuelve la versión nueva.
 /// </summary>
 public sealed class AccionesPagina
 {
     private readonly IRepositorioPaginas _repositorio;
+    private readonly IAlmacenamientoArchivos _almacenamiento;
     private readonly IUsuarioActual _usuarioActual;
     private readonly TimeProvider _reloj;
 
-    public AccionesPagina(IRepositorioPaginas repositorio, IUsuarioActual usuarioActual, TimeProvider reloj)
+    public AccionesPagina(
+        IRepositorioPaginas repositorio,
+        IAlmacenamientoArchivos almacenamiento,
+        IUsuarioActual usuarioActual,
+        TimeProvider reloj)
     {
         _repositorio = repositorio;
+        _almacenamiento = almacenamiento;
         _usuarioActual = usuarioActual;
         _reloj = reloj;
     }
@@ -84,6 +90,30 @@ public sealed class AccionesPagina
         pagina.Ocultar(_reloj.GetUtcNow());
 
         return await _repositorio.GuardarCambiosAsync(pagina, version, cancellationToken);
+    }
+
+    /// <summary>
+    /// Quita la foto del encabezado o de «Sobre» y borra sus archivos (R-16). Si no tenía, no cambia nada.
+    /// </summary>
+    public async Task<string> QuitarFotoAsync(
+        Guid id,
+        LugarFotoPagina lugar,
+        string version,
+        CancellationToken cancellationToken = default)
+    {
+        var pagina = await CargarAsync(id, cancellationToken);
+
+        var quitada = pagina.QuitarFoto(lugar, _reloj.GetUtcNow());
+
+        // Primero la base: si falla, la foto sigue en la página y sus archivos siguen existiendo.
+        var versionNueva = await _repositorio.GuardarCambiosAsync(pagina, version, cancellationToken);
+
+        // Después los archivos. Si esto falla, quedan archivos que nadie muestra, pero nada se rompe.
+        if (quitada is not null)
+            await ArchivosDeFotos.BorrarAsync(
+                _almacenamiento, ClavesFotos.TodasDePagina(pagina.EstudioId, quitada.Id));
+
+        return versionNueva;
     }
 
     private async Task<PaginaPublica> CargarAsync(Guid id, CancellationToken cancellationToken)

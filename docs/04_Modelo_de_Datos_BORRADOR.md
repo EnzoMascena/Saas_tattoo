@@ -4,9 +4,9 @@ Entidades, atributos, relaciones y puntos a revisar.
 
 | Versión | Fecha | Estado | Relacionados |
 | --- | --- | --- | --- |
-| 1.5 | 29 de octubre de 2026 | Versión 1 implementada · MVP en borrador, pendiente de revisión (P-01) | Docs 02, 03, 05, 06 y 07 |
+| 1.6 | 29 de octubre de 2026 | Versión 1 implementada · MVP en borrador, pendiente de revisión (P-01) | Docs 02, 03, 05, 06 y 07 |
 
-> **Estado:** la parte de la versión 1 (blog y base del sistema, sección 2) refleja lo implementado en los cortes 1 y 2. La Página pública está implementada, salvo sus dos fotos (R-16). La parte del MVP (sección 3) sigue en borrador y pendiente de revisión (P-01): es un punto de partida para la discusión, no el diseño final. Las reglas de negocio de los documentos 02, 03 y 07 tienen prioridad sobre este documento.
+> **Estado:** la parte de la versión 1 (blog y base del sistema, sección 2) refleja lo implementado en los cortes 1 y 2. La Página pública está implementada, con sus dos fotos (R-16). La parte del MVP (sección 3) sigue en borrador y pendiente de revisión (P-01): es un punto de partida para la discusión, no el diseño final. Las reglas de negocio de los documentos 02, 03 y 07 tienen prioridad sobre este documento.
 
 > **Novedades de la versión 1.3:**
 > - Las entidades de la versión 1, tal como quedaron implementadas: Estudio, Usuario, CuentaUsuario, Tatuador, Estilo, ZonaCuerpo, Publicación y Foto.
@@ -27,7 +27,7 @@ Entidades, atributos, relaciones y puntos a revisar.
 - **Fechas en UTC (D-43):** se guardan en UTC y se muestran en la zona horaria del estudio, con Argentina por defecto.
 - **Concurrencia optimista:** las entidades que editan varios usuarios llevan un token de versión (rowversion), para que un cambio no pise a otro. En un agregado, la fila raíz se actualiza en cada guardado, así la versión se controla aunque solo cambien sus hijos.
 - **Agregados:** la Publicación es la raíz de sus fotos. Las fotos se agregan, se ordenan y se quitan solo a través de ella, para que sus reglas no se puedan saltear.
-- **Archivos fuera de la base:** la base guarda el Id y las medidas de cada foto. Los archivos se guardan con el puerto de almacenamiento, con la clave `estudios/{estudio}/fotos/{foto}/{tamaño}.webp`.
+- **Archivos fuera de la base:** la base guarda el Id y las medidas de cada foto. Los archivos se guardan con el puerto de almacenamiento, con la clave `estudios/{estudio}/fotos/{foto}/{tamaño}.webp` las de las publicaciones y `estudios/{estudio}/paginas/{foto}/{tamaño}.webp` las de las páginas (R-16).
 
 ---
 
@@ -127,11 +127,15 @@ erDiagram
         string direccion UK
         string nombre
         string bio
-        uuid foto
+        uuid foto_id
+        int foto_ancho
+        int foto_alto
         string instagram
         string whatsapp
         string sobre_texto
-        uuid sobre_foto
+        uuid foto_sobre_id
+        int foto_sobre_ancho
+        int foto_sobre_alto
         string ubicacion
         string horarios
         bool visible
@@ -150,7 +154,7 @@ erDiagram
 | Estilo y ZonaCuerpo | id, estudio_id, nombre (hasta 50, único dentro del estudio), activo | Catálogos por estudio: cada uno arranca con 13 estilos y 16 zonas, y después los adapta. No se borran: se desactivan (R-11). | Implementadas |
 | Publicación | id, estudio_id, tipo (Trabajo o Blog), titulo (hasta 120), descripcion (hasta 2200), fecha_trabajo, estilo_id, zona_cuerpo_id, tatuador_id, destacada, estado (Borrador, Publicada u Oculta), consentimiento_confirmado_por, consentimiento_confirmado_en, creada_por, creada_en, actualizada_en, publicada_en, version | tatuador_id indica la página de destino; vacío, es la del estudio (RN-BLG-12). destacada es «fijada» (RN-BLG-13). publicada_en guarda la primera vez que se publicó: no cambia al ocultar y volver a publicar. | Implementada |
 | Foto | id, estudio_id, publicacion_id, orden (0 es la portada), ancho, alto, subida_en | Solo se cambia a través de su Publicación. El ancho y el alto son los de la versión de detalle. | Implementada |
-| Página pública | id, estudio_id, tatuador_id, direccion, nombre, bio, foto, instagram, whatsapp, sobre_texto, sobre_foto, ubicacion, horarios, visible, version | Una por estudio (tatuador_id vacío) y una por artista. Detalle en la sección 2.3. | Implementada, sin foto ni sobre_foto (R-16) |
+| Página pública | id, estudio_id, tatuador_id, direccion, nombre, bio, foto, instagram, whatsapp, sobre_texto, foto_sobre, ubicacion, horarios, visible, version | Una por estudio (tatuador_id vacío) y una por artista. Detalle en la sección 2.3. | Implementada |
 
 ### 2.3 Página pública
 
@@ -160,11 +164,11 @@ erDiagram
 | direccion | Única en toda la plataforma (RN-BLG-07). Minúsculas, números y guiones, de 3 a 40 caracteres. No puede ser una palabra reservada de la plataforma, como `api`, `panel` o `login`. Se arma a partir del nombre y no cambia sola si después cambia el nombre. |
 | nombre | Hasta 100 caracteres. Lo elige el estudio o el artista. |
 | bio | Hasta 150 caracteres, como la bio de Instagram. |
-| foto | Foto o logo del encabezado (R-16). |
+| foto | Foto o logo del encabezado. Opcional. Se guardan su Id, su ancho y su alto, y los archivos van aparte, con su propia clave (sección 1). Reemplazarla es subir otra, con otro Id; los archivos de la anterior se borran después de guardar (R-16). |
 | instagram | Usuario sin @, hasta 30 caracteres. |
 | whatsapp | Número en formato internacional, por ejemplo +5492215550000. |
 | sobre_texto | Hasta 2200 caracteres. |
-| sobre_foto | Opcional (R-16). |
+| foto_sobre | La foto de «Sobre». Opcional, y se guarda igual que foto (R-16). |
 | ubicacion, horarios | Texto libre. Solo en la página del estudio. |
 | visible | La página no aparece en el sitio hasta que se habilita. |
 
@@ -331,7 +335,7 @@ erDiagram
 | R-13 | Cifrado de las columnas con datos sensibles de clientes, según lo que se defina en P-13. | Abierto |
 | R-14 | Tema visual de cada página pública (colores, tipografías, ornamentos): columnas en la Página pública o una tabla aparte. Se define con el diseño visual. | Abierto |
 | R-15 | Datos repetidos entre Tatuador y Página pública (nombre artístico, bio, Instagram). Propuesta: la página guarda los suyos, y el perfil Tatuador queda para el uso interno del MVP, como el calendario. | Abierto |
-| R-16 | La foto o logo y la foto de «Sobre» de cada página reutilizan el procesamiento de fotos (WebP en varios tamaños), con claves propias en el almacenamiento. | Abierto |
+| R-16 | La foto o logo y la foto de «Sobre» de cada página reutilizan el procesamiento de fotos (WebP en varios tamaños), con claves propias en el almacenamiento. | Resuelto: cada una es un objeto de valor (Id, ancho y alto) en tres columnas que admiten null de la Página pública. Se procesan como las de las publicaciones, con la clave `estudios/{estudio}/paginas/{foto}/{tamaño}.webp`. |
 
 ---
 
@@ -339,6 +343,7 @@ erDiagram
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
+| 1.6 | 29/10/2026 | Se resuelve R-16: la foto o logo y la foto de «Sobre» de cada página, con su clave en el almacenamiento. sobre_foto pasa a llamarse foto_sobre, como en el código. |
 | 1.5 | 29/10/2026 | El estado de la Publicación queda al día: el tipo y el texto de 2200 caracteres ya estaban implementados. |
 | 1.4 | 16/10/2026 | Página pública implementada (tabla PaginasPublicas), sin sus fotos (R-16). |
 | 1.3 | 16/10/2026 | Entidades de la versión 1 tal como quedaron implementadas en los cortes 1 y 2. Propuesta de Página pública. Tipo de publicación y texto de 2200 caracteres (doc 07, 2.0). Se resuelven R-01, R-07, R-09, R-10 y R-11, R-04 en parte, y se suman R-14 a R-16. Diagramas en Mermaid. Pasa a Markdown, en `docs/` del repositorio. |

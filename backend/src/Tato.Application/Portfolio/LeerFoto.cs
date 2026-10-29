@@ -4,8 +4,9 @@ using Tato.Application.Estudios;
 namespace Tato.Application.Portfolio;
 
 /// <summary>
-/// Caso de uso: abrir una versión de una foto para el panel. No consulta la base: la clave del archivo lleva el
-/// estudio de la sesión, así que una foto de otro estudio da una ruta que no existe (D-42).
+/// Caso de uso: abrir una versión de una foto para el panel, de una publicación o de una página (R-16). No consulta
+/// la base: la clave del archivo lleva el estudio de la sesión, así que una foto de otro estudio da una ruta que no
+/// existe (D-42).
 /// </summary>
 public sealed class LeerFoto
 {
@@ -21,7 +22,7 @@ public sealed class LeerFoto
     /// <summary>
     /// Abre el archivo WebP, o devuelve null si no existe. Quien lo abre lo cierra.
     /// </summary>
-    public Task<Stream?> EjecutarAsync(
+    public async Task<Stream?> EjecutarAsync(
         Guid fotoId,
         TamanioFoto tamanio,
         CancellationToken cancellationToken = default)
@@ -29,6 +30,8 @@ public sealed class LeerFoto
         var estudioId = _estudioActual.EstudioId
             ?? throw new InvalidOperationException("No hay un estudio en la sesión.");
 
-        return _almacenamiento.AbrirAsync(ClavesFotos.De(estudioId, fotoId, tamanio), cancellationToken);
+        // Las fotos de página tienen su propia clave: se buscan solo si no es de una publicación.
+        return await _almacenamiento.AbrirAsync(ClavesFotos.De(estudioId, fotoId, tamanio), cancellationToken)
+            ?? await _almacenamiento.AbrirAsync(ClavesFotos.DePagina(estudioId, fotoId, tamanio), cancellationToken);
     }
 }

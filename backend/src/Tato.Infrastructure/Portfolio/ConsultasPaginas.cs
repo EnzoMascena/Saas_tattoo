@@ -42,6 +42,8 @@ internal sealed class ConsultasPaginas : IConsultasPaginas
                 p.Sobre,
                 p.Ubicacion,
                 p.Horarios,
+                p.Foto,
+                p.FotoSobre,
                 p.Visible,
                 p.ActualizadaEn,
                 // La columna de concurrencia es shadow property: se lee con EF.Property.
@@ -49,7 +51,7 @@ internal sealed class ConsultasPaginas : IConsultasPaginas
             })
             .ToListAsync(cancellationToken);
 
-        // La dirección llega como value object: al record va su texto.
+        // La dirección y las fotos llegan como objetos de valor: al record van sus datos.
         return
         [
             .. filas.Select(f => new PaginaDetalle(
@@ -64,9 +66,14 @@ internal sealed class ConsultasPaginas : IConsultasPaginas
                 f.Sobre,
                 f.Ubicacion,
                 f.Horarios,
+                ConMedidas(f.Foto),
+                ConMedidas(f.FotoSobre),
                 f.Visible,
                 f.ActualizadaEn,
                 Convert.ToBase64String(f.Version))),
         ];
     }
+
+    private static FotoConMedidas? ConMedidas(FotoPagina? foto) =>
+        foto is null ? null : new FotoConMedidas(foto.Id, foto.Ancho, foto.Alto);
 }

@@ -91,6 +91,16 @@ public sealed class PaginaPublica : IPerteneceAEstudio
     public string? Horarios { get; private set; }
 
     /// <summary>
+    /// Foto o logo del encabezado (R-16). Opcional.
+    /// </summary>
+    public FotoPagina? Foto { get; private set; }
+
+    /// <summary>
+    /// Foto de la pestaña «Sobre» (R-16). Opcional.
+    /// </summary>
+    public FotoPagina? FotoSobre { get; private set; }
+
+    /// <summary>
     /// Si aparece en el sitio público.
     /// </summary>
     public bool Visible { get; private set; }
@@ -163,6 +173,53 @@ public sealed class PaginaPublica : IPerteneceAEstudio
 
         Visible = false;
         ActualizadaEn = ahora;
+    }
+
+    /// <summary>
+    /// La foto que está en ese lugar, o null si no tiene.
+    /// </summary>
+    public FotoPagina? FotoEn(LugarFotoPagina lugar) => lugar switch
+    {
+        LugarFotoPagina.Encabezado => Foto,
+        LugarFotoPagina.Sobre => FotoSobre,
+        _ => throw new ArgumentOutOfRangeException(nameof(lugar), lugar, "El lugar de la foto no es válido."),
+    };
+
+    /// <summary>
+    /// Pone la foto en el encabezado o en «Sobre». Devuelve la que había, o null, para que el caso de uso borre sus
+    /// archivos después de guardar.
+    /// </summary>
+    public FotoPagina? CambiarFoto(LugarFotoPagina lugar, FotoPagina foto, DateTimeOffset ahora)
+    {
+        ArgumentNullException.ThrowIfNull(foto);
+        FechaUtc.Validar(ahora, nameof(ahora));
+
+        return Reemplazar(lugar, foto, ahora);
+    }
+
+    /// <summary>
+    /// Saca la foto de ese lugar. Devuelve la que había, o null si no tenía: quitarla dos veces no es un error.
+    /// </summary>
+    public FotoPagina? QuitarFoto(LugarFotoPagina lugar, DateTimeOffset ahora)
+    {
+        FechaUtc.Validar(ahora, nameof(ahora));
+
+        return Reemplazar(lugar, null, ahora);
+    }
+
+    private FotoPagina? Reemplazar(LugarFotoPagina lugar, FotoPagina? foto, DateTimeOffset ahora)
+    {
+        // FotoEn también valida el lugar.
+        var anterior = FotoEn(lugar);
+
+        if (lugar == LugarFotoPagina.Encabezado)
+            Foto = foto;
+        else
+            FotoSobre = foto;
+
+        ActualizadaEn = ahora;
+
+        return anterior;
     }
 
     private static PaginaPublica Crear(Guid estudioId, Guid? tatuadorId, DatosPagina datos, DateTimeOffset ahora)

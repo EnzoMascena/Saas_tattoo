@@ -43,6 +43,11 @@ internal sealed class PaginaPublicaConfiguration : IEntityTypeConfiguration<Pagi
         builder.Property(p => p.Ubicacion).HasMaxLength(PaginaPublica.MaxUbicacion);
         builder.Property(p => p.Horarios).HasMaxLength(PaginaPublica.MaxHorarios);
 
+        // R-16: cada foto son tres columnas que admiten null (Foto_Id, Foto_Ancho, Foto_Alto). Es un tipo complejo
+        // opcional: sin foto, las tres quedan en null.
+        builder.ComplexProperty(p => p.Foto, MapearFoto);
+        builder.ComplexProperty(p => p.FotoSobre, MapearFoto);
+
         builder.Property(p => p.Visible).IsRequired();
         builder.Property(p => p.CreadaEn).IsRequired();
         builder.Property(p => p.ActualizadaEn).IsRequired();
@@ -61,5 +66,13 @@ internal sealed class PaginaPublicaConfiguration : IEntityTypeConfiguration<Pagi
         builder.HasIndex(p => p.EstudioId)
             .IsUnique()
             .HasFilter("[TatuadorId] IS NULL");
+    }
+
+    // Las propiedades no tienen setter: EF las mapea solo si se nombran acá.
+    private static void MapearFoto(ComplexPropertyBuilder<FotoPagina> foto)
+    {
+        foto.Property(f => f.Id);
+        foto.Property(f => f.Ancho);
+        foto.Property(f => f.Alto);
     }
 }

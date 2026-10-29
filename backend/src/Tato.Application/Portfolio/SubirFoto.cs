@@ -60,7 +60,11 @@ public sealed class SubirFoto
         try
         {
             // Primero los archivos y después la base: la base nunca apunta a archivos que no existen.
-            await GuardarArchivosAsync(publicacion.EstudioId, foto.Id, procesada, cancellationToken);
+            await ArchivosDeFotos.GuardarAsync(
+                _almacenamiento,
+                procesada,
+                tamanio => ClavesFotos.De(publicacion.EstudioId, foto.Id, tamanio),
+                cancellationToken);
 
             var versionNueva = await _repositorio.GuardarCambiosAsync(publicacion, version, cancellationToken);
 
@@ -69,31 +73,8 @@ public sealed class SubirFoto
         catch
         {
             // No se pudo guardar (por ejemplo, 409): sin esto, los archivos quedarían huérfanos.
-            await BorrarArchivosAsync(publicacion.EstudioId, foto.Id);
+            await ArchivosDeFotos.BorrarAsync(_almacenamiento, ClavesFotos.Todas(publicacion.EstudioId, foto.Id));
             throw;
         }
-    }
-
-    private async Task GuardarArchivosAsync(
-        Guid estudioId,
-        Guid fotoId,
-        FotoProcesada procesada,
-        CancellationToken cancellationToken)
-    {
-        foreach (var versionFoto in procesada.Versiones)
-        {
-            using var contenido = new MemoryStream(versionFoto.Contenido, writable: false);
-            await _almacenamiento.GuardarAsync(
-                ClavesFotos.De(estudioId, fotoId, versionFoto.Tamanio), contenido, cancellationToken);
-        }
-    }
-
-    /// <summary>
-    /// Sin CancellationToken a propósito: la limpieza tiene que terminar aunque se haya cancelado el pedido.
-    /// </summary>
-    private async Task BorrarArchivosAsync(Guid estudioId, Guid fotoId)
-    {
-        foreach (var clave in ClavesFotos.Todas(estudioId, fotoId))
-            await _almacenamiento.BorrarAsync(clave, CancellationToken.None);
     }
 }

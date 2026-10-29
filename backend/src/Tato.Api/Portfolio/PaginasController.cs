@@ -86,6 +86,45 @@ public sealed class PaginasController : ControllerBase
         [FromServices] AccionesPagina acciones,
         CancellationToken cancellationToken) =>
         new(await acciones.OcultarAsync(id, solicitud.Version, cancellationToken));
+
+    /// <summary>
+    /// Sube la foto o logo del encabezado, o la foto de «Sobre», como formulario (multipart/form-data). Si ya tenía
+    /// una, la reemplaza (R-16). La imagen se pide después en GET /api/fotos/{fotoId}/{tamanio}.
+    /// </summary>
+    /// <param name="lugar">encabezado o sobre.</param>
+    /// <param name="archivo">La foto, tal como la saca el celular.</param>
+    /// <param name="version">La versión que tenía el panel.</param>
+    [HttpPost("{id:guid}/fotos/{lugar}")]
+    public async Task<ActionResult<FotoPaginaSubida>> SubirFoto(
+        Guid id,
+        LugarFotoPagina lugar,
+        IFormFile archivo,
+        [FromForm] string version,
+        [FromServices] SubirFotoPagina subirFoto,
+        CancellationToken cancellationToken)
+    {
+        await using var contenido = archivo.OpenReadStream();
+        var resultado = await subirFoto.EjecutarAsync(id, lugar, contenido, version, cancellationToken);
+
+        return CreatedAtAction(
+            nameof(FotosController.Leer),
+            "Fotos",
+            new { fotoId = resultado.Foto.Id, tamanio = TamanioFoto.Detalle },
+            resultado);
+    }
+
+    /// <summary>
+    /// Quita la foto y borra sus archivos. Si no tenía, no cambia nada. Es POST y no DELETE para mandar la versión
+    /// en el cuerpo, como las demás acciones.
+    /// </summary>
+    [HttpPost("{id:guid}/fotos/{lugar}/quitar")]
+    public async Task<PaginaVersionRespuesta> QuitarFoto(
+        Guid id,
+        LugarFotoPagina lugar,
+        SolicitudVersion solicitud,
+        [FromServices] AccionesPagina acciones,
+        CancellationToken cancellationToken) =>
+        new(await acciones.QuitarFotoAsync(id, lugar, solicitud.Version, cancellationToken));
 }
 
 /// <summary>

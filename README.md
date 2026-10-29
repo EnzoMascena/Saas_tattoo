@@ -5,7 +5,7 @@ Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 La primera entrega es el **blog y portfolio público**: una página parecida a un perfil de Instagram para cada estudio y para cada artista. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
-> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página». Sigue, hasta el 2/11: terminar el backend con las fotos de cada página, los endpoints públicos, la preparación para producción y las vistas previas. Después, el panel y el sitio.
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página», con la foto o logo y la foto de «Sobre». Sigue, hasta el 2/11: terminar el backend con los endpoints públicos, la preparación para producción y las vistas previas. Después, el panel y el sitio.
 
 ---
 
@@ -133,7 +133,7 @@ Todo exige sesión, y todo es del estudio de la sesión. Los pedidos que modific
 | `POST` | `/api/publicaciones/{id}/fotos/{fotoId}/quitar` | Quita la foto y borra sus archivos |
 | `PUT` | `/api/publicaciones/{id}/fotos/orden` | Reordena: la primera queda como portada |
 | `POST` | `/api/publicaciones/{id}/fotos/{fotoId}/portada` | Pone esa foto primera |
-| `GET` | `/api/fotos/{fotoId}/{tamanio}` | Devuelve la versión `miniatura`, `galeria` o `detalle` en WebP |
+| `GET` | `/api/fotos/{fotoId}/{tamanio}` | Devuelve la versión `miniatura`, `galeria` o `detalle` en WebP, de una publicación o de una página |
 
 Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para seguir editando sin recargar.
 
@@ -142,12 +142,14 @@ Cada cambio recibe la `version` que tenía el panel y devuelve la nueva, para se
 | Método | Ruta | Qué hace |
 | --- | --- | --- |
 | `GET` | `/api/paginas` | Las páginas que gestiona la persona: la suya de artista y, si es Dueño, la del estudio |
-| `GET` | `/api/paginas/{id}` | Detalle, con su `direccion` y su `version` |
+| `GET` | `/api/paginas/{id}` | Detalle, con su `direccion`, sus fotos (`foto` y `fotoSobre`, con Id, ancho y alto) y su `version` |
 | `POST` | `/api/paginas` | Crea la del estudio (`delEstudio: true`) o la propia de artista (`201`). Nace oculta y la dirección sale del nombre |
 | `PUT` | `/api/paginas/{id}` | Reemplaza los datos. La dirección no cambia (RN-BLG-07) |
 | `PUT` | `/api/paginas/{id}/direccion` | Cambia la dirección a propósito. Única en toda la plataforma |
 | `POST` | `/api/paginas/{id}/mostrar` | La muestra en el sitio |
 | `POST` | `/api/paginas/{id}/ocultar` | La saca del sitio sin borrarla |
+| `POST` | `/api/paginas/{id}/fotos/{lugar}` | Sube la foto o logo del encabezado (`encabezado`) o la foto de «Sobre» (`sobre`): `multipart/form-data` con `archivo` y `version` (`201`). Si ya tenía una, la reemplaza (R-16) |
+| `POST` | `/api/paginas/{id}/fotos/{lugar}/quitar` | Quita esa foto y borra sus archivos. Si no tenía, no cambia nada |
 
 ### Permisos
 
@@ -311,7 +313,7 @@ docs: cerrar P-18 con el hosting elegido
 
 - [x] **5 al 25/10**: repositorio y entorno (corte 0); login, estudios, usuarios y aislamiento por estudio (corte 1); backend del panel (corte 2); tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página»
 - [ ] **26/10 al 2/11**: terminar el backend
-  - [ ] Fotos de cada página (R-16)
+  - [x] Fotos de cada página (R-16)
   - [ ] Endpoints públicos
   - [ ] Listo para producción: configuración, Docker, backups y guía de despliegue
   - [ ] Vistas previas y SEO

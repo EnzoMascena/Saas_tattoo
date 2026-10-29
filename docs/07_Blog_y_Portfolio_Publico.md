@@ -4,7 +4,7 @@ Requerimientos de la primera entrega: las páginas públicas del estudio y de su
 
 | Versión | Fecha | Estado | Relacionados |
 | --- | --- | --- | --- |
-| 2.2 | 29 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
+| 2.3 | 29 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
 
 > **Prioridad (D-46):** el blog es la primera entrega y tiene que estar online antes del **17 de noviembre de 2026**, cuando la tatuadora del estudio piloto viaja a tatuar a Bolivia. El MVP de gestión sigue después.
 
@@ -91,7 +91,7 @@ Los datos de cada página (nombre, bio, foto, contacto y «Sobre») los edita su
 | --- | --- | --- |
 | Publicación | Tipo (Trabajo o Blog), título, texto de hasta 2200 caracteres, de 1 a 10 fotos (la primera es la portada), fijada, estado (Borrador, Publicada u Oculta) y consentimiento (quién lo confirmó y cuándo). | Va a la página de su artista; sin artista, a la del estudio (RN-BLG-12). Nunca guarda datos del cliente. Estilo, zona del cuerpo y fecha del trabajo ya existen en el modelo, pero el front de la versión 1 no los usa. |
 | Foto | Tres versiones optimizadas (miniatura, galería y detalle), orden, ancho y alto. | Implementada en el corte 2 (doc 04). |
-| Página pública | Dirección, nombre, bio corta, foto o logo, Instagram, WhatsApp, y el texto y la foto de «Sobre». En la del estudio, además, la ubicación y los horarios. | Una por estudio y una por artista. Implementada, salvo la foto o logo y la foto de «Sobre» (R-16, doc 04). |
+| Página pública | Dirección, nombre, bio corta, foto o logo, Instagram, WhatsApp, y el texto y la foto de «Sobre». En la del estudio, además, la ubicación y los horarios. | Una por estudio y una por artista. Implementada, con la foto o logo y la foto de «Sobre» (R-16, doc 04). |
 
 ---
 
@@ -187,7 +187,7 @@ Plan actualizado el 29/10: el backend se termina primero y el front va después,
 | Fechas | Objetivo | Estado al 29/10 |
 | --- | --- | --- |
 | 5 al 25 de octubre | Repositorio y entorno (corte 0). Login, estudios, usuarios y aislamiento (corte 1). Backend del panel (corte 2). Ajustes a esta versión: tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página». | Listo. |
-| 26 de octubre al 2 de noviembre | Terminar el backend: fotos de cada página (R-16), endpoints públicos, preparación para producción, y vistas previas y SEO. | En curso. |
+| 26 de octubre al 2 de noviembre | Terminar el backend: fotos de cada página (R-16), endpoints públicos, preparación para producción, y vistas previas y SEO. | En curso: las fotos de cada página, listas. |
 | 3 al 9 de noviembre | El panel, con su wireframe, y el primer despliegue (P-18). | — |
 | 10 al 16 de noviembre | El sitio público y las pruebas en celulares. | — |
 | 17 de noviembre | Online. | — |
@@ -256,6 +256,7 @@ Salen del Instagram de cada uno. Se usan en la etapa de diseño, después de apr
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
+| 2.3 | 29/10/2026 | La Página pública, implementada con sus dos fotos (R-16): el panel las sube, las reemplaza y las quita. |
 | 2.2 | 29/10/2026 | Plan nuevo hasta el 17/11 (sección 11): el backend se termina hasta el 2/11; el panel y el primer despliegue van del 3 al 9/11, y el sitio, del 10 al 16/11. Se aplica el primer recorte: tema visual común para las tres páginas. |
 | 2.1 | 16/10/2026 | Estado de las reglas: RN-BLG-07 y RN-BLG-11 implementadas; RN-BLG-12, en parte. La Página pública, implementada en el backend sin sus fotos. |
 | 2.0 | 16/10/2026 | Se cierran las preguntas de la 1.0 y el alcance se achica a un portfolio parecido a Instagram, con páginas por estudio y por artista. Decisiones D-48 a D-56. Reglas RN-BLG-11 a RN-BLG-13; RN-BLG-07 ampliada, RN-BLG-08 postergada y RN-BLG-09 reemplazada. Pasa a Markdown, en `docs/` del repositorio. |
