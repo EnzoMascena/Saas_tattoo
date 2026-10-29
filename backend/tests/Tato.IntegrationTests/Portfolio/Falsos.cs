@@ -21,11 +21,11 @@ internal sealed record UsuarioFalso(Guid? UsuarioId, bool EsDuenio, bool EsAdmin
 internal sealed record EstudioFalso(Guid? EstudioId) : IEstudioActual;
 
 /// <summary>
-/// Un reloj que siempre da la misma hora, para que los tests no dependan de cuándo se corren.
+/// Un reloj que da siempre la misma hora, para que los tests no dependan de cuándo se corren. Solo avanza a pedido.
 /// </summary>
 internal sealed class RelojFijo : TimeProvider
 {
-    private readonly DateTimeOffset _ahora;
+    private DateTimeOffset _ahora;
 
     public RelojFijo(DateTimeOffset ahora)
     {
@@ -33,6 +33,8 @@ internal sealed class RelojFijo : TimeProvider
     }
 
     public override DateTimeOffset GetUtcNow() => _ahora;
+
+    public void Avanzar(TimeSpan tiempo) => _ahora += tiempo;
 }
 
 /// <summary>

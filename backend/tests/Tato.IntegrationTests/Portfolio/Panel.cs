@@ -117,6 +117,13 @@ internal sealed partial class Panel
         return await acciones.PublicarAsync(id, version);
     }
 
+    public async Task<string> OcultarAsync(Guid id, string version)
+    {
+        await using var db = Contexto();
+        var acciones = new AccionesPublicacion(new RepositorioPublicaciones(db), Usuario, Reloj);
+        return await acciones.OcultarAsync(id, version);
+    }
+
     public async Task<FotoSubida> SubirFotoAsync(Guid id, string version)
     {
         await using var db = Contexto();
