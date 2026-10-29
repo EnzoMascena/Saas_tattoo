@@ -72,7 +72,7 @@ internal sealed class ManejadorErrores : IExceptionHandler
             Detail = noEncontrado.Message,
         },
 
-        // Tiene sesión, pero su rol no le permite hacerlo (P-21).
+        // Tiene sesión, pero su rol no le permite hacerlo (D-51).
         AccesoDenegadoException acceso => new ProblemDetails
         {
             Status = StatusCodes.Status403Forbidden,

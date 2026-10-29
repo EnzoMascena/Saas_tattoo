@@ -5,7 +5,7 @@ using Tato.Domain.Portfolio;
 namespace Tato.IntegrationTests.Portfolio;
 
 /// <summary>
-/// Casos de uso de publicaciones contra SQL Server: control de versión, permisos (P-21) y aislamiento (D-42).
+/// Casos de uso de publicaciones contra SQL Server: control de versión, permisos (D-51) y aislamiento (D-42).
 /// </summary>
 public sealed class PanelPublicacionesTests : IClassFixture<BaseDeDatosFixture>
 {

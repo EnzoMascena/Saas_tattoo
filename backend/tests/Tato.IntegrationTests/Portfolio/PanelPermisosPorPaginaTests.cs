@@ -5,7 +5,7 @@ namespace Tato.IntegrationTests.Portfolio;
 
 /// <summary>
 /// Permisos por página contra SQL Server (D-51): la página de un artista la gestiona solo ese artista, ni siquiera
-/// un Dueño; la del estudio sigue las reglas de P-21.
+/// un Dueño; la del estudio sigue los roles del doc 07, sección 5.
 /// </summary>
 public sealed class PanelPermisosPorPaginaTests : IClassFixture<BaseDeDatosFixture>
 {

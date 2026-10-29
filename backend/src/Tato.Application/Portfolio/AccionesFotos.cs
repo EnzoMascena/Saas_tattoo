@@ -6,7 +6,7 @@ namespace Tato.Application.Portfolio;
 
 /// <summary>
 /// Casos de uso sobre las fotos de una publicación: quitar, reordenar y elegir la portada. Puede hacerlos quien
-/// puede editar la publicación (P-21). Cada uno guarda con la versión que tenía el panel y devuelve la nueva.
+/// puede editar la publicación (D-51). Cada uno guarda con la versión que tenía el panel y devuelve la nueva.
 /// </summary>
 public sealed class AccionesFotos
 {
