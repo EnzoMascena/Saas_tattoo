@@ -133,6 +133,67 @@ public sealed class PaginasPublicasPersistenciaTests : IClassFixture<BaseDeDatos
         Assert.Equal(0, cantidad);
     }
 
+    [Fact]
+    public async Task Guardar_ConSusDosFotos_SeLeenIgual()
+    {
+        // Arrange
+        var pagina = PaginaDeArtista(Guid.NewGuid());
+        var foto = FotoPagina.Crear(400, 400);
+        var sobre = FotoPagina.Crear(1080, 1350);
+        pagina.CambiarFoto(LugarFotoPagina.Encabezado, foto, Ahora);
+        pagina.CambiarFoto(LugarFotoPagina.Sobre, sobre, Ahora);
+
+        // Act
+        await GuardarAsync(_estudioId, pagina);
+
+        // Assert
+        await using var contexto = _baseDeDatos.CrearContexto(_estudioId);
+        var leida = await contexto.PaginasPublicas.SingleAsync(p => p.Id == pagina.Id);
+
+        Assert.Equal(foto, leida.Foto);
+        Assert.Equal(sobre, leida.FotoSobre);
+    }
+
+    [Fact]
+    public async Task Guardar_SinFotos_LasLeeComoNull()
+    {
+        // Arrange
+        var pagina = PaginaDeArtista(Guid.NewGuid());
+
+        // Act
+        await GuardarAsync(_estudioId, pagina);
+
+        // Assert
+        await using var contexto = _baseDeDatos.CrearContexto(_estudioId);
+        var leida = await contexto.PaginasPublicas.SingleAsync(p => p.Id == pagina.Id);
+
+        Assert.Null(leida.Foto);
+        Assert.Null(leida.FotoSobre);
+    }
+
+    [Fact]
+    public async Task QuitarFoto_YGuardar_LaDejaEnNull()
+    {
+        // Arrange
+        var pagina = PaginaDeArtista(Guid.NewGuid());
+        pagina.CambiarFoto(LugarFotoPagina.Encabezado, FotoPagina.Crear(400, 400), Ahora);
+        await GuardarAsync(_estudioId, pagina);
+
+        // Act: se quita desde otro contexto, como en otro pedido.
+        await using (var contexto = _baseDeDatos.CrearContexto(_estudioId))
+        {
+            var guardada = await contexto.PaginasPublicas.SingleAsync(p => p.Id == pagina.Id);
+            guardada.QuitarFoto(LugarFotoPagina.Encabezado, Ahora);
+            await contexto.SaveChangesAsync();
+        }
+
+        // Assert
+        await using var lectura = _baseDeDatos.CrearContexto(_estudioId);
+        var leida = await lectura.PaginasPublicas.SingleAsync(p => p.Id == pagina.Id);
+
+        Assert.Null(leida.Foto);
+    }
+
     /// <summary>
     /// Todos los tests de la clase comparten la base: cada página necesita un nombre, y una dirección, únicos.
     /// </summary>
