@@ -5,7 +5,7 @@ Plataforma SaaS multi-tenant para la gestión de estudios de tatuajes.
 La primera entrega es el **blog y portfolio público**: una página parecida a un perfil de Instagram para cada estudio y para cada artista. Sobre la misma base llega después el **MVP de gestión**: agenda, señas, clientes, tatuajes y sesiones.
 
 > **Estado:** en desarrollo. Versión 1 (blog) online antes del **17 de noviembre de 2026** (D-46).
-> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página», con la foto o logo y la foto de «Sobre». Sigue, hasta el 2/11: terminar el backend con los endpoints públicos, la preparación para producción y las vistas previas. Después, el panel y el sitio.
+> Listo: login, estudios, usuarios, aislamiento por estudio y el backend del panel: publicaciones con fotos, tipo Trabajo o Blog, permisos por página y «Mi página», con la foto o logo y la foto de «Sobre». También los endpoints del sitio público, con caché. Sigue, hasta el 2/11: terminar el backend con la preparación para producción y las vistas previas. Después, el panel y el sitio.
 
 ---
 
@@ -176,6 +176,21 @@ Todos los errores llegan como ProblemDetails (RFC 9457), con un `detail` que se 
 
 ---
 
+## API del sitio público
+
+Lo que lee el sitio: sin sesión, de solo lectura y con caché. Solo sale lo visible y lo Publicado (RN-BLG-01), y cada página muestra solo lo suyo (RN-BLG-12). Lo demás responde `404`, igual que lo que no existe: una página oculta con todo lo suyo, una publicación de otra página y una dirección reservada o mal formada. Nunca salen datos de clientes ni internos (RN-BLG-02).
+
+| Método | Ruta | Qué devuelve |
+| --- | --- | --- |
+| `GET` | `/api/publico/paginas/{direccion}` | Encabezado (nombre, bio, foto o logo, Instagram y WhatsApp), «Sobre» (texto y foto; en la del estudio, también ubicación y horarios) y relacionadas: la del estudio trae a sus artistas visibles, y la de un artista, su estudio si está visible |
+| `GET` | `/api/publico/paginas/{direccion}/publicaciones?tipo=&pagina=&tamanio=` | Las de un tipo (`Trabajo` por defecto, o `Blog`), primero las fijadas y después de la más nueva a la más vieja (RN-BLG-13). Cada una con su portada, título y fecha; las del Blog, con el comienzo del texto |
+| `GET` | `/api/publico/paginas/{direccion}/publicaciones/{id}` | El detalle: fotos en orden, título, texto y fecha |
+| `GET` | `/api/publico/fotos/{fotoId}/{tamanio}.webp` | Una foto de una publicación Publicada de una página visible, o de una página visible. La extensión va en la ruta porque Cloudflare cachea por extensión |
+
+**Caché (D-57).** Las páginas y las publicaciones se guardan en la caché de salida del servidor, en memoria, que se vacía entera con cualquier cambio desde el panel. Para el navegador: los datos, `public, max-age=60`; las fotos, `public, max-age=3600`, que también guarda Cloudflare. Algo que se oculta deja de verse en el sitio en hasta un minuto, y su foto, por link directo, hasta una hora. Los tiempos se configuran en la sección `Sitio` de `appsettings.json`.
+
+---
+
 ## Estructura del repositorio
 
 ```
@@ -283,7 +298,7 @@ Los tests de integración levantan un SQL Server 2025 en Docker. Para usar uno y
 Nada hardcodeado (D-34):
 
 - **Parámetros de negocio**: viven en la configuración de cada estudio, en la base, con valores por defecto (por ejemplo, el máximo de fotos por publicación, 10 por defecto). Nunca en el código.
-- **Parámetros técnicos**: `appsettings.json` tipados con el patrón Options y validados al arrancar: con una configuración imposible, la API no levanta. Por ejemplo, `Fotos` (peso y píxeles máximos, lado de cada tamaño, calidad de WebP) y `Almacenamiento:Disco:CarpetaRaiz`.
+- **Parámetros técnicos**: `appsettings.json` tipados con el patrón Options y validados al arrancar: con una configuración imposible, la API no levanta. Por ejemplo, `Fotos` (peso y píxeles máximos, lado de cada tamaño, calidad de WebP), `Sitio` (tiempos de caché y largo del comienzo del texto del Blog) y `Almacenamiento:Disco:CarpetaRaiz`.
 - **Secretos**: nunca en el repositorio. `dotnet user-secrets` en desarrollo; variables de entorno en producción.
 - **Front**: variables en `.env.local` (ignorado por git), con un `.env.example` versionado como referencia. Todo lo que llega al front es público: ahí no van secretos.
 
@@ -314,7 +329,7 @@ docs: cerrar P-18 con el hosting elegido
 - [x] **5 al 25/10**: repositorio y entorno (corte 0); login, estudios, usuarios y aislamiento por estudio (corte 1); backend del panel (corte 2); tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página»
 - [ ] **26/10 al 2/11**: terminar el backend
   - [x] Fotos de cada página (R-16)
-  - [ ] Endpoints públicos
+  - [x] Endpoints públicos
   - [ ] Listo para producción: configuración, Docker, backups y guía de despliegue
   - [ ] Vistas previas y SEO
 - [ ] **3 al 9/11**: el panel, con su wireframe, y el primer despliegue (P-18)

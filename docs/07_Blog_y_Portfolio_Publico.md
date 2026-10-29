@@ -4,7 +4,7 @@ Requerimientos de la primera entrega: las páginas públicas del estudio y de su
 
 | Versión | Fecha | Estado | Relacionados |
 | --- | --- | --- | --- |
-| 2.3 | 29 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
+| 2.4 | 29 de octubre de 2026 | Aprobado para la versión 1 | Docs 01, 04, 05 y 06 |
 
 > **Prioridad (D-46):** el blog es la primera entrega y tiene que estar online antes del **17 de noviembre de 2026**, cuando la tatuadora del estudio piloto viaja a tatuar a Bolivia. El MVP de gestión sigue después.
 
@@ -27,6 +27,7 @@ Requerimientos de la primera entrega: las páginas públicas del estudio y de su
 | D-54 | El consentimiento del cliente (RN-BLG-03) se pide para publicar cualquier publicación, sea trabajo o blog. | Ya está implementado, en el panel es una sola casilla y protege al estudio. |
 | D-55 | En la versión 1, los estudios y los usuarios los da de alta el desarrollador por consola. Cierra P-19. | Para un solo estudio piloto no hace falta registro. Aplicada en el corte 1. |
 | D-56 | Dos aplicaciones de front, el sitio y el panel, en el mismo repositorio. Cierra P-28. | El sitio queda liviano y sin login; el panel crece hasta ser la app del MVP. Aplicada en el corte 0. |
+| D-57 | Caché del sitio público: la caché de salida de ASP.NET Core, en memoria, guarda las páginas y las publicaciones y se vacía entera con cualquier cambio desde el panel. Para el navegador, los datos se guardan un minuto (`public, max-age=60`) y las fotos una hora (`public, max-age=3600`), que también guarda Cloudflare. Algo que se oculta deja de verse en el sitio en hasta un minuto, y su foto, por link directo, hasta una hora. | Con una sola instancia alcanza la memoria: Redis queda para cuando haya varias (doc 06). A esta escala, vaciar todo es lo más simple y nunca deja nada viejo. Los tiempos equilibran lo que tarda en desaparecer algo oculto con no pedirle todo al servidor en cada visita. Se invalida en un filtro de la API, así Application no depende de ASP.NET. |
 
 ---
 
@@ -149,8 +150,8 @@ Si otra persona modificó la publicación mientras se editaba, el panel muestra 
 
 | ID | Regla | Estado |
 | --- | --- | --- |
-| RN-BLG-01 | El sitio público solo muestra publicaciones en estado Publicada. | Vigente |
-| RN-BLG-02 | Ninguna página pública muestra datos de clientes. | Vigente |
+| RN-BLG-01 | El sitio público solo muestra publicaciones en estado Publicada. | Implementada |
+| RN-BLG-02 | Ninguna página pública muestra datos de clientes. | Implementada: los endpoints públicos no devuelven datos de clientes ni internos |
 | RN-BLG-03 | Para publicar hay que confirmar que el cliente dio su consentimiento para difundir las fotos. Se registra quién lo confirmó y cuándo. Vale para trabajos y para el blog (D-54). | Implementada |
 | RN-BLG-04 | Para publicar hace falta al menos una foto, y la primera es la portada. Una publicación publicada no puede quedarse sin fotos. El máximo es configurable por estudio, con 10 por defecto. | Implementada |
 | RN-BLG-05 | Las fotos se optimizan al subirlas: miniatura, galería y detalle, en WebP y sin metadatos. El sitio nunca sirve los originales. | Implementada |
@@ -160,8 +161,8 @@ Si otra persona modificó la publicación mientras se editaba, el panel muestra 
 | RN-BLG-09 | Quién publica. | Reemplazada por los permisos por página (D-51) |
 | RN-BLG-10 | Versión 2: «Publicar en blog» desde un tatuaje Finalizado del MVP crea una publicación en borrador con sus fotos y datos, sin datos del cliente (RN-TAT-11). | Versión 2 |
 | RN-BLG-11 | El texto de una publicación tiene hasta 2200 caracteres, el mismo límite que Instagram. | Implementada |
-| RN-BLG-12 | Una publicación va a la página de su artista; sin artista, a la del estudio. Cada página muestra solo sus propias publicaciones. | En parte: el panel ya asigna cada publicación a su página; falta el sitio |
-| RN-BLG-13 | Las publicaciones fijadas aparecen primero; las demás, de la publicada más recientemente a la más vieja. | Nueva · por implementar |
+| RN-BLG-12 | Una publicación va a la página de su artista; sin artista, a la del estudio. Cada página muestra solo sus propias publicaciones. | Implementada |
+| RN-BLG-13 | Las publicaciones fijadas aparecen primero; las demás, de la publicada más recientemente a la más vieja. | Implementada |
 
 ---
 
@@ -172,7 +173,7 @@ La misma que el MVP (D-47).
 - **Front:** dos aplicaciones en el mismo repositorio (D-56): el sitio público, liviano y sin login, y el panel. React, TypeScript, Vite, Tailwind CSS con shadcn/ui, React Router, TanStack Query y React Hook Form con Zod (doc 06). El cliente de la API se genera desde el OpenAPI con Orval.
 - **Backend:** el módulo Portfolio, más la base de Estudios e identidad que después usa el MVP.
   - Los endpoints del panel usan la cookie de sesión y están implementados desde el corte 2 (ver el README).
-  - Los endpoints públicos son de solo lectura, con caché, y están por implementar.
+  - Los endpoints públicos son de solo lectura, con caché (D-57), y están implementados (ver el README).
 - **Vistas previas:** el backend entrega el HTML con los metadatos (sección 7.5). Google sí ejecuta JavaScript al indexar, aunque puede tardar más; si el posicionamiento orgánico se vuelve crítico, se suma prerenderizado sin cambiar el stack.
 - **Fotos:** se procesan con NetVips al subirlas y se guardan a través del puerto de almacenamiento (doc 06, 6.1): en el disco del servidor o en un almacenamiento de objetos, según el hosting (P-18).
 - **Multi-tenancy:** aislamiento por estudio desde el primer día (D-42), con el estudio piloto como primer estudio.
@@ -187,7 +188,7 @@ Plan actualizado el 29/10: el backend se termina primero y el front va después,
 | Fechas | Objetivo | Estado al 29/10 |
 | --- | --- | --- |
 | 5 al 25 de octubre | Repositorio y entorno (corte 0). Login, estudios, usuarios y aislamiento (corte 1). Backend del panel (corte 2). Ajustes a esta versión: tipo de publicación, texto de 2200 caracteres, permisos por página y «Mi página». | Listo. |
-| 26 de octubre al 2 de noviembre | Terminar el backend: fotos de cada página (R-16), endpoints públicos, preparación para producción, y vistas previas y SEO. | En curso: las fotos de cada página, listas. |
+| 26 de octubre al 2 de noviembre | Terminar el backend: fotos de cada página (R-16), endpoints públicos, preparación para producción, y vistas previas y SEO. | En curso: las fotos de cada página y los endpoints públicos, listos. |
 | 3 al 9 de noviembre | El panel, con su wireframe, y el primer despliegue (P-18). | — |
 | 10 al 16 de noviembre | El sitio público y las pruebas en celulares. | — |
 | 17 de noviembre | Online. | — |
@@ -256,6 +257,7 @@ Salen del Instagram de cada uno. Se usan en la etapa de diseño, después de apr
 
 | Versión | Fecha | Cambios |
 | --- | --- | --- |
+| 2.4 | 29/10/2026 | Endpoints públicos implementados: RN-BLG-01, RN-BLG-02, RN-BLG-12 y RN-BLG-13. Decisión D-57: la caché del sitio. |
 | 2.3 | 29/10/2026 | La Página pública, implementada con sus dos fotos (R-16): el panel las sube, las reemplaza y las quita. |
 | 2.2 | 29/10/2026 | Plan nuevo hasta el 17/11 (sección 11): el backend se termina hasta el 2/11; el panel y el primer despliegue van del 3 al 9/11, y el sitio, del 10 al 16/11. Se aplica el primer recorte: tema visual común para las tres páginas. |
 | 2.1 | 16/10/2026 | Estado de las reglas: RN-BLG-07 y RN-BLG-11 implementadas; RN-BLG-12, en parte. La Página pública, implementada en el backend sin sus fotos. |
