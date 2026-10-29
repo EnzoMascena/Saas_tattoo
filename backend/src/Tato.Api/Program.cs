@@ -15,8 +15,14 @@ if (esComando)
 
 builder.Services.AddOpenApi(opciones => opciones.AddDocumentTransformer<DocumentarAntiforgery>());
 
-// Todo POST, PUT, PATCH y DELETE de los controladores exige el token antiforgery (doc 06, 7.1).
-builder.Services.AddControllers(opciones => opciones.Filters.Add<ValidarAntiforgery>())
+builder.Services.AddControllers(opciones =>
+    {
+        // Todo POST, PUT, PATCH y DELETE de los controladores exige el token antiforgery (doc 06, 7.1).
+        opciones.Filters.Add<ValidarAntiforgery>();
+
+        // Y, si sale bien, vacía la caché del sitio público (D-57).
+        opciones.Filters.Add<InvalidarCacheSitio>();
+    })
     // Los enums viajan como texto ("Borrador"), no como número: el front no depende del orden del enum.
     .AddJsonOptions(opciones => opciones.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 
@@ -58,6 +64,9 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseRateLimiter();
+
+// Después de la autorización: solo guarda lo que pasó todos los controles, y solo los endpoints con [OutputCache].
+app.UseOutputCache();
 
 app.MapControllers();
 

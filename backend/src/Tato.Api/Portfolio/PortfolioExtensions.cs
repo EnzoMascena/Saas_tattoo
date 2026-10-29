@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.Extensions.Options;
 using Tato.Application.Portfolio;
 
 namespace Tato.Api.Portfolio;
@@ -29,6 +31,16 @@ public static class PortfolioExtensions
                 "Los tiempos de caché del sitio tienen que ser mayores a 0.")
             .Validate(o => o.LargoExtracto > 0, "El largo del extracto tiene que ser mayor a 0.")
             .ValidateOnStart();
+
+        // Caché de salida en memoria para el sitio (D-57). Vence con el mismo tiempo que el navegador, pero cualquier
+        // cambio desde el panel la vacía antes (InvalidarCacheSitio).
+        services.AddOutputCache();
+        services.AddOptions<OutputCacheOptions>()
+            .Configure<IOptions<OpcionesSitio>>((cache, sitio) => cache.AddPolicy(
+                SitioController.PoliticaCache,
+                politica => politica
+                    .Expire(TimeSpan.FromSeconds(sitio.Value.SegundosCacheDatos))
+                    .Tag(SitioController.EtiquetaCache)));
 
         return services;
     }
