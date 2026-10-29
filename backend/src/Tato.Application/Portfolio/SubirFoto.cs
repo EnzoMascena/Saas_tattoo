@@ -5,7 +5,7 @@ namespace Tato.Application.Portfolio;
 
 /// <summary>
 /// Caso de uso: subir una foto a una publicación (RN-BLG-04, RN-BLG-05). La procesa, guarda sus versiones y la
-/// agrega al final. Puede hacerlo quien puede editar la publicación (P-21).
+/// agrega al final. Puede hacerlo quien puede editar la publicación (D-51).
 /// <para>
 /// Los archivos y la base no comparten transacción. Por eso primero se guardan los archivos y después la base,
 /// y si algo falla se borran los archivos: nunca queda una foto en la base sin sus archivos, ni archivos sueltos.

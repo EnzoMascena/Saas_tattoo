@@ -1,7 +1,7 @@
 namespace Tato.Domain.Portfolio;
 
 /// <summary>
-/// Estado de una publicación del blog (doc 07, sección 5). Se guarda como número: los valores no se cambian.
+/// Estado de una publicación (doc 07, sección 6). Se guarda como número: los valores no se cambian.
 /// <para>
 /// Es un enum y no el patrón State: todas las transiciones están permitidas y las dos reglas que hay
 /// (RN-BLG-03 y RN-BLG-04) se controlan al publicar. Es el mismo criterio que el doc 06 aplica al Tatuaje.

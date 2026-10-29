@@ -10,7 +10,7 @@ namespace Tato.Application.Portfolio;
 /// <item>Página de un artista (la publicación tiene TatuadorId): solo ese artista crea, edita, publica y oculta.
 /// Nadie más, tampoco un Dueño.</item>
 /// <item>Página del estudio (sin TatuadorId): cualquiera con sesión crea; Dueño y Administrativo editan, publican
-/// y ocultan todo; un Tatuador edita lo que creó, sin publicar ni ocultar (P-21).</item>
+/// y ocultan todo; un Tatuador edita lo que creó, sin publicar ni ocultar.</item>
 /// </list>
 /// </summary>
 internal static class PermisosPublicaciones

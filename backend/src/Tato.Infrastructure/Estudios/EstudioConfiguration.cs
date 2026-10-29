@@ -34,6 +34,5 @@ internal sealed class EstudioConfiguration : IEntityTypeConfiguration<Estudio>
         builder.Property(e => e.DiasVencimientoSenia).IsRequired();
         builder.Property(e => e.MaxReagendamientos).IsRequired();
         builder.Property(e => e.MaxFotosPorPublicacion).IsRequired();
-        builder.Property(e => e.MaxFotosPorPublicacion).IsRequired();
     }
 }
